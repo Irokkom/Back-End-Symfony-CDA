@@ -1,0 +1,40 @@
+<div class="container mt-4">
+    <h1>Modération des commentaires</h1>
+
+    <div *ngIf="error" class="alert alert-danger">
+        {{ error }}
+    </div>
+
+    <div *ngIf="loading" class="d-flex justify-content-center">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Chargement...</span>
+        </div>
+    </div>
+
+    <div class="list-group mt-4">
+        <div *ngFor="let comment of comments" class="list-group-item">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-1">Par {{ comment.author }}</h5>
+                    <small class="text-muted">Le {{ comment.createdAt | date:'dd/MM/yyyy HH:mm' }}</small>
+                    <p class="mb-1 mt-2">{{ comment.content }}</p>
+                    <small>Article: {{ comment.articleTitle }}</small>
+                </div>
+                <div class="btn-group">
+                    <button (click)="moderateComment(comment.id, 'approved')" 
+                            class="btn btn-success btn-sm">
+                        Approuver
+                    </button>
+                    <button (click)="moderateComment(comment.id, 'rejected')" 
+                            class="btn btn-danger btn-sm ms-2">
+                        Rejeter
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="!loading && comments.length === 0" class="alert alert-info">
+            Aucun commentaire en attente de modération.
+        </div>
+    </div>
+</div>

@@ -1,0 +1,30 @@
+twig:
+    default_path: '%kernel.project_dir%/templates'
+    debug: '%kernel.debug%'
+    strict_variables: true
+    form_themes:
+        - 'bootstrap_5_layout.html.twig'
+        - 'form/custom_types.html.twig'
+    globals:
+        site_name: 'Mon Blog'
+        site_description: 'Un blog moderne avec Symfony'
+    date:
+        format: 'd/m/Y H:i'
+        interval_format: '%%d jours'
+        timezone: 'Europe/Paris'
+    number_format:
+        decimals: 2
+        decimal_point: ','
+        thousands_separator: ' '
+    cache: '%kernel.cache_dir%/twig'
+    auto_reload: '%kernel.debug%'
+    optimizations: -1
+
+when@dev:
+    twig:
+        strict_variables: true
+        cache: false
+
+when@prod:
+    twig:
+        cache: '%kernel.cache_dir%/twig'

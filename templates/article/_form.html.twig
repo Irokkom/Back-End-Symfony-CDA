@@ -1,0 +1,94 @@
+{{ form_start(form, {'attr': {'class': 'article-form needs-validation'}}) }}
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <div class="mb-3">
+                        {{ form_widget(form.title) }}
+                        {{ form_errors(form.title) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form_widget(form.content) }}
+                        {{ form_errors(form.content) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-header">Catégories</div>
+                <div class="card-body">
+                    {{ form_row(form.categories) }}
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">Médias</div>
+                <div class="card-body">
+                    {{ form_row(form.medias) }}
+                    <button type="button" class="btn btn-outline-primary btn-sm" 
+                            data-collection-holder-class="medias"
+                            data-prototype="{{ form_widget(form.medias.vars.prototype)|e('html_attr') }}">
+                        <i class="fas fa-plus"></i> Ajouter un média
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <button class="btn btn-primary">{{ button_label|default('Enregistrer') }}</button>
+        <a href="{{ path('app_article_index') }}" class="btn btn-secondary">Retour à la liste</a>
+    </div>
+{{ form_end(form) }}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Gestion de la collection de médias
+    const addFormToCollection = (e) => {
+        const collectionHolder = document.querySelector('.' + e.currentTarget.dataset.collectionHolderClass);
+        const item = document.createElement('div');
+        item.innerHTML = e.currentTarget.dataset.prototype.replace(
+            /__name__/g,
+            collectionHolder.dataset.index
+        );
+        collectionHolder.appendChild(item);
+        collectionHolder.dataset.index++;
+        
+        // Ajouter un bouton de suppression
+        addTagFormDeleteLink(item);
+    };
+
+    const addTagFormDeleteLink = (item) => {
+        const removeFormButton = document.createElement('button');
+        removeFormButton.classList.add('btn', 'btn-danger', 'btn-sm', 'mt-2');
+        removeFormButton.innerHTML = '<i class="fas fa-trash"></i> Supprimer';
+
+        item.appendChild(removeFormButton);
+
+        removeFormButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            item.remove();
+        });
+    };
+
+    // Ajouter le bouton de suppression aux éléments existants
+    document.querySelectorAll('.medias div').forEach((tag) => {
+        addTagFormDeleteLink(tag);
+    });
+
+    // Configurer le compteur
+    const collectionHolder = document.querySelector('.medias');
+    if (collectionHolder) {
+        collectionHolder.dataset.index = collectionHolder.querySelectorAll('input').length;
+    }
+
+    // Ajouter un nouveau formulaire
+    document.querySelectorAll('button[data-collection-holder-class]')
+        .forEach(button => {
+            button.addEventListener('click', addFormToCollection);
+        });
+});
+</script>
+{% endblock %}

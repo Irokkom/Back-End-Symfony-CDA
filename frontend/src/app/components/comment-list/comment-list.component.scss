@@ -1,0 +1,16 @@
+.list-group-item {
+    transition: all 0.3s ease;
+
+    &:hover {
+        background-color: #f8f9fa;
+    }
+}
+
+.btn-group {
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+
+    .list-group-item:hover & {
+        opacity: 1;
+    }
+}

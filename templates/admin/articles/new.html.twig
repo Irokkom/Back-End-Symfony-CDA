@@ -1,0 +1,139 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un nouvel article{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .media-collection {
+            border: 1px solid #dee2e6;
+            padding: 1rem;
+            border-radius: 0.25rem;
+            margin-bottom: 1rem;
+        }
+        .media-item {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+            background-color: #f8f9fa;
+        }
+        select.form-select[multiple] {
+            height: auto;
+            min-height: 150px;
+        }
+        .form-control, .form-select {
+            margin-top: 0.5rem;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Créer un nouvel article</h1>
+            <a href="{{ path('admin_articles_list') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Retour à la liste
+            </a>
+        </div>
+
+        <div class="card shadow">
+            <div class="card-body">
+                {{ form_start(form) }}
+                    <div class="mb-3">
+                        {{ form_label(form.title) }}
+                        {{ form_widget(form.title) }}
+                        {{ form_errors(form.title) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.content) }}
+                        {{ form_widget(form.content) }}
+                        {{ form_errors(form.content) }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Catégories</label>
+                        <select name="{{ form.categories.vars.full_name }}" 
+                                id="{{ form.categories.vars.id }}" 
+                                class="form-select" 
+                                multiple="multiple" 
+                                required="required">
+                            {% for choice in form.categories.vars.choices %}
+                                <option value="{{ choice.value }}"
+                                    {% if choice.value in form.categories.vars.value|default([]) %}selected="selected"{% endif %}>
+                                    {{ choice.label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        {{ form_errors(form.categories) }}
+                        <small class="form-text text-muted">
+                            Maintenez la touche Ctrl enfoncée pour sélectionner plusieurs catégories
+                        </small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Médias</label>
+                        <div class="media-collection"
+                             data-prototype="{{ form_widget(form.medias.vars.prototype)|e('html_attr') }}"
+                             data-index="{{ form.medias|length }}">
+                            {% for media in form.medias %}
+                                <div class="media-item">
+                                    {{ form_row(media.type) }}
+                                    {{ form_row(media.url) }}
+                                    <button type="button" class="btn btn-danger btn-sm mt-2 remove-media">
+                                        <i class="fas fa-trash me-1"></i> Supprimer
+                                    </button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <button type="button" class="btn btn-success btn-sm mt-2" id="add-media">
+                            <i class="fas fa-plus me-1"></i> Ajouter un média
+                        </button>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i> Créer l'article
+                        </button>
+                    </div>
+                    {{ form_widget(form._token) }}
+                {{ form_end(form, {'render_rest': false}) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mediaCollection = document.querySelector('.media-collection');
+            const addMediaButton = document.querySelector('#add-media');
+            let index = mediaCollection.dataset.index;
+
+            // Ajouter un nouveau média
+            addMediaButton.addEventListener('click', function() {
+                const prototype = mediaCollection.dataset.prototype;
+                const newForm = prototype.replace(/__name__/g, index);
+                const mediaItem = document.createElement('div');
+                mediaItem.className = 'media-item';
+                mediaItem.innerHTML = newForm + `
+                    <button type="button" class="btn btn-danger btn-sm mt-2 remove-media">
+                        <i class="fas fa-trash me-1"></i> Supprimer
+                    </button>
+                `;
+                mediaCollection.appendChild(mediaItem);
+                index++;
+            });
+
+            // Supprimer un média
+            mediaCollection.addEventListener('click', function(e) {
+                if (e.target.classList.contains('remove-media') || e.target.closest('.remove-media')) {
+                    const mediaItem = e.target.closest('.media-item');
+                    mediaItem.remove();
+                }
+            });
+        });
+    </script>
+{% endblock %}

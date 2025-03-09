@@ -1,0 +1,138 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inscription{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h1 class="h3 mb-0">Inscription</h1>
+                    </div>
+                    <div class="card-body">
+                        {% for message in app.flashes('error') %}
+                            <div class="alert alert-danger">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+
+                        {{ form_start(registrationForm) }}
+                            <div class="form-group mb-3">
+                                <label class="form-label">Nom d'utilisateur</label>
+                                {{ form_widget(registrationForm.username, {
+                                    'attr': {
+                                        'class': 'form-control',
+                                        'placeholder': 'Ex: JohnDoe'
+                                    }
+                                }) }}
+                                {{ form_errors(registrationForm.username) }}
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label">Adresse email</label>
+                                {{ form_widget(registrationForm.email, {
+                                    'attr': {
+                                        'class': 'form-control',
+                                        'placeholder': 'Ex: john.doe@example.com'
+                                    }
+                                }) }}
+                                {{ form_errors(registrationForm.email) }}
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label">Mot de passe</label>
+                                <div class="input-group">
+                                    <input type="password" 
+                                           id="inputPassword" 
+                                           name="{{ registrationForm.plainPassword.vars.full_name }}" 
+                                           required="required" 
+                                           class="form-control" 
+                                           placeholder="6 caractères minimum"
+                                           autocomplete="new-password"
+                                    >
+                                    <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()">
+                                        <i class="fas fa-eye" id="toggleIcon"></i>
+                                    </button>
+                                </div>
+                                {{ form_errors(registrationForm.plainPassword) }}
+                                
+                                <!-- Prérequis du mot de passe -->
+                                <div class="password-requirements mt-2 p-3 border rounded bg-light">
+                                    <p class="mb-1 fw-bold text-muted"><i class="fas fa-info-circle me-1"></i> Prérequis du mot de passe:</p>
+                                    <ul class="small text-muted mb-0 ps-3">
+                                        <li>Au moins 6 caractères</li>
+                                        <li>Mélangez lettres, chiffres et caractères spéciaux pour plus de sécurité</li>
+                                        <li>Évitez d'utiliser des informations personnelles facilement devinables</li>
+                                        <li>Pensez à utiliser une phrase ou des mots faciles à retenir pour vous</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label">Code administrateur (optionnel)</label>
+                                {{ form_widget(registrationForm.adminCode, {
+                                    'attr': {
+                                        'class': 'form-control',
+                                        'placeholder': 'Laissez vide pour un compte standard'
+                                    }
+                                }) }}
+                                <div class="form-text text-muted">
+                                    Si vous avez un code administrateur, entrez-le ici.
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="{{ registrationForm.agreeTerms.vars.id }}" name="{{ registrationForm.agreeTerms.vars.full_name }}" required="required">
+                                    <label class="form-check-label" for="{{ registrationForm.agreeTerms.vars.id }}">
+                                        J'accepte les conditions d'utilisation
+                                    </label>
+                                </div>
+                                {{ form_errors(registrationForm.agreeTerms) }}
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-user-plus me-1"></i> S'inscrire
+                                </button>
+                                <a href="{{ path('app_login') }}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-sign-in-alt me-1"></i> Déjà inscrit ? Se connecter
+                                </a>
+                            </div>
+                        {{ form_end(registrationForm, {'render_rest': false}) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .form-check-input {
+            cursor: pointer;
+        }
+        .form-check-label {
+            cursor: pointer;
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+function togglePassword() {
+    const passwordInput = document.getElementById('inputPassword');
+    const toggleIcon = document.getElementById('toggleIcon');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+    }
+}
+</script>
+{% endblock %}

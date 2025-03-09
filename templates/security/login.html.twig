@@ -1,0 +1,98 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="card shadow">
+                    <div class="card-body p-4">
+                        <h1 class="card-title h3 mb-4 text-center">Connexion</h1>
+
+                        {% if error %}
+                            <div class="alert alert-danger">
+                                {% if error.messageKey == 'Invalid credentials.' %}
+                                    Identifiants invalides. Veuillez vérifier votre email et mot de passe.
+                                {% else %}
+                                    {{ error.messageKey|trans(error.messageData, 'security') }}
+                                {% endif %}
+                            </div>
+                        {% endif %}
+
+                        <form method="post" action="{{ path('app_login') }}">
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                            <div class="mb-3">
+                                <label for="inputEmail" class="form-label">Email</label>
+                                <input type="email" value="{{ last_username }}" name="_username" id="inputEmail" class="form-control text-center" autocomplete="email" required autofocus>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="inputPassword" class="form-label">Mot de passe</label>
+                                <div class="input-group">
+                                    <input type="password" name="_password" id="inputPassword" class="form-control text-center" autocomplete="current-password" required>
+                                    <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()">
+                                        <i class="fas fa-eye" id="toggleIcon"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="_remember_me" id="remember_me">
+                                    <label class="form-check-label" for="remember_me">
+                                        Se souvenir de moi
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">Se connecter</button>
+                                <a href="{{ path('app_register') }}" class="btn btn-outline-primary">S'inscrire</a>
+                            </div>
+
+                            <div class="text-center mt-3">
+                                <a href="{{ path('app_forgot_password_request') }}" class="text-decoration-none">
+                                    Mot de passe oublié ?
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .card {
+            border: none;
+            border-radius: 10px;
+        }
+        .form-control {
+            border-radius: 8px;
+            padding: 10px 15px;
+        }
+        .btn {
+            padding: 10px;
+            border-radius: 8px;
+        }
+    </style>
+
+    <script>
+    function togglePassword() {
+        const passwordInput = document.getElementById('inputPassword');
+        const toggleIcon = document.getElementById('toggleIcon');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleIcon.classList.remove('fa-eye');
+            toggleIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            toggleIcon.classList.remove('fa-eye-slash');
+            toggleIcon.classList.add('fa-eye');
+        }
+    }
+    </script>
+{% endblock %}

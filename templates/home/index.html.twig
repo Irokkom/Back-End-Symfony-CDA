@@ -1,0 +1,199 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <!-- Section Hero avec l'article en vedette - Déplacée au-dessus de la barre de recherche -->
+    {% if featured_article %}
+        <div class="bg-image mb-5">
+            <div class="container text-center py-5">
+                <h1 class="display-3 fw-bold mb-3">{{ featured_article.title }}</h1>
+                <p class="lead mb-4 col-md-8 mx-auto">{{ featured_article.content|striptags|slice(0, 200) }}...</p>
+                <div class="mb-4">
+                    {% for category in featured_article.categories %}
+                        <span class="badge bg-primary me-2 category-badge">{{ category.name }}</span>
+                    {% endfor %}
+                </div>
+                <a href="{{ path('app_article_show', {'id': featured_article.id}) }}" class="btn btn-light btn-lg">
+                    <i class="fas fa-book-open me-1"></i> Lire l'article
+                </a>
+            </div>
+        </div>
+    {% else %}
+        <!-- Hero de remplacement si pas d'article en vedette -->
+        <div class="hero mb-5">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-6 mb-4 mb-lg-0">
+                        <h1 class="display-4 fw-bold mb-3">Bienvenue sur notre plateforme d'articles</h1>
+                        <p class="lead mb-4">Découvrez des articles variés, rédigés par notre communauté d'experts et de passionnés.</p>
+                        <a href="{{ path('app_article_index') }}" class="btn btn-custom btn-lg">
+                            <i class="fas fa-newspaper me-1"></i> Voir tous les articles
+                        </a>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="placeholder-img w-100" style="height: 300px; border-radius: 0.5rem;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Barre de recherche améliorée - Déplacée après la section Hero -->
+    <div class="search-navbar bg-light p-3 rounded mb-4">
+        {{ form_start(search_form, {'attr': {'class': 'search-form'}}) }}
+            <!-- Barre de recherche principale -->
+            <div class="mb-3">
+                {{ form_widget(search_form.query, {'attr': {'placeholder': 'Rechercher un article par titre, contenu ou catégorie...'}}) }}
+                <button type="submit" class="btn btn-primary search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            
+            <!-- Filtres alignés -->
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-2">
+                        <label class="form-label fw-bold">Catégorie</label>
+                        {{ form_widget(search_form.category) }}
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="mb-2">
+                        <label class="form-label fw-bold">Date de début</label>
+                        {{ form_widget(search_form.dateFrom) }}
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="mb-2">
+                        <label class="form-label fw-bold">Date de fin</label>
+                        {{ form_widget(search_form.dateTo) }}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Boutons alignés à droite -->
+            <div class="d-flex justify-content-end mt-3">
+                <a href="{{ path('app_home') }}" class="btn btn-outline-secondary me-2">
+                    <i class="fas fa-times me-1"></i> Réinitialiser les filtres
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-filter me-1"></i> Filtrer
+                </button>
+            </div>
+        {{ form_end(search_form) }}
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <!-- Section Articles Récents -->
+            <div class="col-lg-8 mb-5">
+                {% if search_results is not empty %}
+                    <div class="recent-articles">
+                        <h2 class="mb-4 text-center">Résultats de la recherche</h2>
+                        <div class="row row-cols-1 row-cols-md-2 g-4">
+                            {% for article in search_results %}
+                                {% include 'partials/_article_card.html.twig' with {'article': article} %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="recent-articles">
+                        <h2 class="mb-4 text-center">Articles Récents</h2>
+                        <p class="text-center mb-4">Découvrez nos dernières publications partagées par notre communauté</p>
+                        <div class="row row-cols-1 row-cols-md-2 g-4">
+                            {% for article in latest_articles %}
+                                {% include 'partials/_article_card.html.twig' with {'article': article} %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <div class="text-center mt-4">
+                    <a href="{{ path('app_article_index') }}" class="btn btn-primary">
+                        <i class="fas fa-newspaper me-1"></i> Voir tous les articles
+                    </a>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Section Catégories -->
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h5 class="card-title mb-0"><i class="fas fa-tags me-2"></i>Catégories</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        {% for category in categories %}
+                            <a href="{{ path('app_article_by_category', {'name': category.name}) }}" 
+                               class="list-group-item list-group-item-action d-flex justify-content-between align-items-center hover-card">
+                                {{ category.name }}
+                                <span class="badge bg-primary rounded-pill">{{ category.articles|length }}</span>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Section Actions -->
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <h5 class="card-title"><i class="fas fa-users me-2"></i>Participez à la communauté</h5>
+                        <p class="card-text">Rejoignez notre communauté et participez aux discussions autour des articles.</p>
+                        {% if not app.user %}
+                            <a href="{{ path('app_login') }}" class="btn btn-primary w-100 mb-2">
+                                <i class="fas fa-sign-in-alt me-1"></i> Se connecter
+                            </a>
+                            <a href="{{ path('app_register') }}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-user-plus me-1"></i> S'inscrire
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .search-navbar {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+    
+    .search-form .form-control,
+    .search-form .form-select {
+        border-color: #e9ecef;
+        border-radius: 4px;
+        height: 42px;
+    }
+    
+    .search-form input[type="search"] {
+        padding-right: 40px;
+    }
+    
+    .search-form .search-btn {
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        border-radius: 4px;
+        padding: 6px 12px;
+    }
+    
+    .search-form .mb-3 {
+        position: relative;
+    }
+    
+    .bg-image {
+        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        color: white;
+        border-radius: 8px;
+    }
+</style>
+{% endblock %}

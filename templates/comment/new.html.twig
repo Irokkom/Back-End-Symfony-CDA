@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau commentaire - {{ article.title }}{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <h1 class="h3 mb-4">Commenter l'article "{{ article.title }}"</h1>
+
+                {{ include('comment/_form.html.twig') }}
+
+                <a href="{{ path('app_article_show', {'id': article.id}) }}" class="btn btn-secondary mt-3">
+                    <i class="fas fa-arrow-left"></i> Retour à l'article
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

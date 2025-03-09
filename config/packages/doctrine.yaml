@@ -1,0 +1,85 @@
+doctrine:
+    dbal:
+        url: '%env(resolve:DATABASE_URL)%'
+        charset: utf8mb4
+        default_table_options:
+            charset: utf8mb4
+            collate: utf8mb4_unicode_ci
+        types:
+            datetime_immutable: Doctrine\DBAL\Types\DateTimeImmutableType
+        logging: false
+        profiling: false
+
+        # Optimisations de performance
+        server_version: '8.0'
+        options:
+            1002: "SET NAMES 'UTF8'"
+        schema_filter: ~^(?!session)~
+
+    orm:
+        auto_generate_proxy_classes: true
+        enable_lazy_ghost_objects: true
+        report_fields_where_declared: true
+        validate_xml_mapping: true
+        naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+        auto_mapping: true
+        mappings:
+            App:
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Entity'
+                prefix: 'App\Entity'
+                alias: App
+
+        # Configuration du second niveau de cache
+        second_level_cache:
+            enabled: true
+            region_cache_driver:
+                type: pool
+                pool: doctrine.system_cache_pool
+            regions:
+                default:
+                    lifetime: 3600
+                    cache_driver:
+                        type: pool
+                        pool: doctrine.result_cache_pool
+                    lock_lifetime: 60
+                query:
+                    lifetime: 3600
+                    cache_driver:
+                        type: pool
+                        pool: doctrine.result_cache_pool
+                    lock_lifetime: 60
+
+        # Optimisations des requêtes
+        dql:
+            string_functions:
+                MATCH_AGAINST: App\Doctrine\Extension\MatchAgainst
+            datetime_functions:
+                DATE: DoctrineExtensions\Query\Mysql\Date
+                MONTH: DoctrineExtensions\Query\Mysql\Month
+                YEAR: DoctrineExtensions\Query\Mysql\Year
+
+when@test:
+    doctrine:
+        dbal:
+            dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+
+when@prod:
+    doctrine:
+        orm:
+            auto_generate_proxy_classes: false
+            proxy_dir: '%kernel.build_dir%/doctrine/orm/Proxies'
+            query_cache_driver:
+                type: pool
+                pool: doctrine.system_cache_pool
+            result_cache_driver:
+                type: pool
+                pool: doctrine.result_cache_pool
+
+    framework:
+        cache:
+            pools:
+                doctrine.result_cache_pool:
+                    adapter: cache.app
+                doctrine.system_cache_pool:
+                    adapter: cache.system

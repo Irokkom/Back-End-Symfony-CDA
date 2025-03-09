@@ -1,0 +1,115 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon profil{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        <div class="row">
+            <!-- Carte de profil principale -->
+            <div class="col-md-4 mb-4">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="mb-0"><i class="fas fa-user-circle me-2"></i>Mon profil</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-4">
+                            <div class="avatar-placeholder mb-3">
+                                <i class="fas fa-user-circle fa-5x text-primary"></i>
+                            </div>
+                            <h3>{{ user.username }}</h3>
+                            <p class="text-muted">
+                                <i class="fas fa-envelope me-2"></i>{{ user.email }}
+                            </p>
+                            <p class="text-muted">
+                                <i class="fas fa-calendar me-2"></i>Membre depuis {{ user.createdAt|date('d/m/Y') }}
+                            </p>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <a href="{{ path('app_profile_edit') }}" class="btn btn-primary">
+                                <i class="fas fa-edit me-1"></i> Modifier mon profil
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistiques et activités -->
+            <div class="col-md-8">
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Statistiques</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-6 mb-3">
+                                <div class="p-3 border rounded bg-light">
+                                    <h1 class="display-4 text-primary">{{ articlesCount }}</h1>
+                                    <p class="lead">Articles publiés</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="p-3 border rounded bg-light">
+                                    <h1 class="display-4 text-primary">{{ commentsCount }}</h1>
+                                    <p class="lead">Commentaires</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rôles et permissions -->
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0"><i class="fas fa-shield-alt me-2"></i>Rôles et permissions</h3>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            {% for role in user.roles %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    {% if role == 'ROLE_ADMIN' %}
+                                        <span><i class="fas fa-user-shield me-2 text-danger"></i> Administrateur</span>
+                                        <span class="badge bg-danger rounded-pill">Admin</span>
+                                    {% elseif role == 'ROLE_EDITOR' %}
+                                        <span><i class="fas fa-edit me-2 text-warning"></i> Éditeur</span>
+                                        <span class="badge bg-warning rounded-pill">Éditeur</span>
+                                    {% elseif role == 'ROLE_USER' %}
+                                        <span><i class="fas fa-user me-2 text-primary"></i> Utilisateur</span>
+                                        <span class="badge bg-primary rounded-pill">Utilisateur</span>
+                                    {% else %}
+                                        <span><i class="fas fa-tag me-2"></i> {{ role }}</span>
+                                        <span class="badge bg-secondary rounded-pill">{{ role }}</span>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <a href="{{ path('app_home') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Retour à l'accueil
+            </a>
+        </div>
+    </div>
+
+    <style>
+        .avatar-placeholder {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: #f8f9fa;
+        }
+    </style>
+{% endblock %}

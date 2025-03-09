@@ -1,0 +1,6 @@
+framework:
+    rate_limiter:
+        comment:
+            policy: 'fixed_window'
+            limit: 5
+            interval: '15 minutes'

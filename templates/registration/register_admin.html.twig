@@ -1,0 +1,98 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inscription Administrateur{% endblock %}
+
+{% block body %}
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-5">
+            <div class="card shadow">
+                <div class="card-body p-4">
+                    <h1 class="card-title h3 mb-4 text-center">Inscription Administrateur</h1>
+
+                    {{ form_start(registrationForm, {'attr': {'class': 'needs-validation'}}) }}
+                        <div class="mb-3">
+                            {{ form_widget(registrationForm.username) }}
+                            {% if registrationForm.username.vars.errors|length > 0 %}
+                                <div class="invalid-feedback d-block">
+                                    {{ registrationForm.username.vars.errors[0].message }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_widget(registrationForm.email) }}
+                            {% if registrationForm.email.vars.errors|length > 0 %}
+                                <div class="invalid-feedback d-block">
+                                    {{ registrationForm.email.vars.errors[0].message }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_widget(registrationForm.plainPassword) }}
+                            {% if registrationForm.plainPassword.vars.errors is not empty %}
+                                <div class="text-danger mt-1">
+                                    {{ registrationForm.plainPassword.vars.errors[0].message }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check">
+                                {{ form_widget(registrationForm.agreeTerms, {
+                                    'attr': {
+                                        'class': 'form-check-input'
+                                    }
+                                }) }}
+                                {{ form_label(registrationForm.agreeTerms, null, {
+                                    'label_attr': {
+                                        'class': 'form-check-label'
+                                    }
+                                }) }}
+                            </div>
+                            {% if registrationForm.agreeTerms.vars.errors|length > 0 %}
+                                <div class="invalid-feedback d-block">
+                                    {{ registrationForm.agreeTerms.vars.errors[0].message }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Créer l'administrateur</button>
+                        </div>
+                    {{ form_end(registrationForm) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .card {
+            border: none;
+            border-radius: 10px;
+        }
+        .form-control {
+            border-radius: 8px;
+            padding: 10px 15px;
+        }
+        .btn-primary {
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .form-check-input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            margin-top: 0.2em;
+        }
+        .form-check-input:checked {
+            background-color: var(--bs-primary);
+            border-color: var(--bs-primary);
+        }
+        .form-check-label {
+            cursor: pointer;
+            user-select: none;
+            padding-left: 0.5em;
+        }
+    </style>
+{% endblock %}

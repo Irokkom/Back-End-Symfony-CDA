@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Réinitialisation du mot de passe{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h1 class="h3 mb-0">Réinitialiser votre mot de passe</h1>
+                </div>
+                <div class="card-body">
+                    {{ form_start(resetForm) }}
+                        <div class="mb-3">
+                            {{ form_label(resetForm.plainPassword.first, 'Nouveau mot de passe', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(resetForm.plainPassword.first, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(resetForm.plainPassword.first) }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_label(resetForm.plainPassword.second, 'Confirmer le mot de passe', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(resetForm.plainPassword.second, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(resetForm.plainPassword.second) }}
+                        </div>
+                        
+                        <!-- Prérequis du mot de passe -->
+                        <div class="password-requirements mb-4 p-3 border rounded bg-light">
+                            <p class="mb-1 fw-bold text-muted"><i class="fas fa-info-circle me-1"></i> Prérequis du mot de passe:</p>
+                            <ul class="small text-muted mb-0 ps-3">
+                                <li>Au moins 6 caractères</li>
+                                <li>Mélangez lettres, chiffres et caractères spéciaux pour plus de sécurité</li>
+                                <li>Évitez d'utiliser des informations personnelles facilement devinables</li>
+                                <li>Pensez à utiliser une phrase ou des mots faciles à retenir pour vous</li>
+                            </ul>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-key me-1"></i> Réinitialiser le mot de passe
+                            </button>
+                            <a href="{{ path('app_login') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Retour à la connexion
+                            </a>
+                        </div>
+                    {{ form_end(resetForm) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

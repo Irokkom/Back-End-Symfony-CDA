@@ -1,0 +1,16 @@
+App\Entity\Article:
+    attributes:
+        id:
+            groups: ['article:read']
+        title:
+            groups: ['article:read', 'article:write']
+        content:
+            groups: ['article:read', 'article:write']
+        createdAt:
+            groups: ['article:read']
+        updatedAt:
+            groups: ['article:read']
+        category:
+            groups: ['article:read', 'article:write']
+        comments:
+            groups: ['article:read']

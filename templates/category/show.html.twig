@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Category{% endblock %}
+
+{% block body %}
+    <h1>Category</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ category.id }}</td>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <td>{{ category.name }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_category_index') }}">back to list</a>
+
+    {% if is_granted('ROLE_ADMIN') %}
+        <a href="{{ path('admin_categories_edit', {'id': category.id}) }}">edit</a>
+
+        {{ include('admin/categories/_delete_form.html.twig') }}
+    {% endif %}
+{% endblock %}

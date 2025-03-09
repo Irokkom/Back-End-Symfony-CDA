@@ -1,0 +1,110 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil de {{ user.username }}{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Profil de {{ user.username }}</h1>
+            <a href="{{ path('admin_users_list') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Retour à la liste
+            </a>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h1 class="h3 mb-0">Profil de {{ user.username }}</h1>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-3 text-center">
+                                <div class="avatar-circle mb-3">
+                                    <i class="fas fa-user fa-3x text-primary"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <h2 class="h4 mb-3">Informations</h2>
+                                <table class="table">
+                                    <tr>
+                                        <th>Nom d'utilisateur :</th>
+                                        <td>{{ user.username }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Email :</th>
+                                        <td>{{ user.email }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Rôle :</th>
+                                        <td>
+                                            {% if 'ROLE_ADMIN' in user.roles %}
+                                                <span class="badge bg-danger">Administrateur</span>
+                                            {% else %}
+                                                <span class="badge bg-info">Utilisateur</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Articles publiés :</th>
+                                        <td>
+                                            <span class="badge bg-secondary">{{ user.articles|length }}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Date d'inscription :</th>
+                                        <td>{{ user.createdAt|date('d/m/Y') }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        {% if user.articles|length > 0 %}
+                            <div class="articles-section mt-4">
+                                <h3 class="h5 mb-3">Articles publiés</h3>
+                                <div class="list-group">
+                                    {% for article in user.articles %}
+                                        <a href="#" class="list-group-item list-group-item-action">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h5 class="mb-1">{{ article.title }}</h5>
+                                                <small class="text-muted">{{ article.createdAt|date('d/m/Y') }}</small>
+                                            </div>
+                                            <p class="mb-1">{{ article.content|striptags|slice(0, 100) }}...</p>
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <div class="mt-4">
+                            <a href="{{ path('admin_users_edit', {'id': user.id}) }}" class="btn btn-warning">
+                                <i class="fas fa-edit me-1"></i> Modifier
+                            </a>
+                            {% if user.id != app.user.id %}
+                                <form action="{{ path('admin_users_delete', {'id': user.id}) }}" method="post" class="d-inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                                    <button type="submit" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')">
+                                        <i class="fas fa-trash me-1"></i> Supprimer
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .avatar-circle {
+            width: 100px;
+            height: 100px;
+            background-color: #f8f9fa;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+    </style>
+{% endblock %}

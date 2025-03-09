@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier mon profil{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="mb-0"><i class="fas fa-edit me-2"></i>Modifier mon profil</h2>
+                    </div>
+                    <div class="card-body">
+                        {% for message in app.flashes('success') %}
+                            <div class="alert alert-success">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+
+                        {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                            <div class="mb-3">
+                                {{ form_label(form.username, 'Nom d\'utilisateur', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.username, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_errors(form.username) }}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form_label(form.email, 'Adresse email', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_errors(form.email) }}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form_label(form.plainPassword, 'Nouveau mot de passe (laisser vide pour conserver l\'actuel)', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.plainPassword, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_errors(form.plainPassword) }}
+                                <div class="form-text">
+                                    <small>Laissez ce champ vide si vous ne souhaitez pas changer votre mot de passe.</small>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i> Enregistrer les modifications
+                                </button>
+                                <a href="{{ path('app_profile') }}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left me-1"></i> Retour au profil
+                                </a>
+                            </div>
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

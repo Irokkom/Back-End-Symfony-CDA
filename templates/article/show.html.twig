@@ -1,0 +1,166 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <article class="article-content">
+            <header class="mb-4">
+                <h1>{{ article.title }}</h1>
+                <div class="article-meta text-muted mb-3">
+                    <small>
+                        <i class="fas fa-user me-1"></i> Par {{ article.author.username }}
+                        <span class="mx-2">•</span>
+                        <i class="fas fa-calendar me-1"></i> {{ article.createdAt|date('d/m/Y H:i') }}
+                    </small>
+                </div>
+                <div class="article-categories mb-3">
+                    {% for category in article.categories %}
+                        <span class="badge bg-info me-1">{{ category.name }}</span>
+                    {% endfor %}
+                </div>
+            </header>
+
+            <div class="article-body mb-4">
+                {{ article.content|nl2br }}
+            </div>
+
+            {% if article.medias|length > 0 %}
+                <div class="article-media mb-4">
+                    <h4>Médias</h4>
+                    <div class="row g-3">
+                        {% for media in article.medias %}
+                            <div class="col-md-4">
+                                <div class="card h-100">
+                                    {% if media.type == 'image' %}
+                                        <img src="{{ media.url }}" class="card-img-top" alt="Media">
+                                    {% elseif media.type == 'video' %}
+                                        <div class="ratio ratio-16x9">
+                                            <iframe src="{{ media.url }}" allowfullscreen></iframe>
+                                        </div>
+                                    {% endif %}
+                                    <div class="card-body">
+                                        <p class="card-text">
+                                            <small class="text-muted">
+                                                Type: {{ media.type|capitalize }}
+                                            </small>
+                                        </p>
+                                        <a href="{{ media.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-external-link-alt me-1"></i> Voir
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </article>
+
+        {% if is_granted('ROLE_ADMIN') %}
+            <div class="article-actions mt-4">
+                <a href="{{ path('admin_articles_edit', {'id': article.id}) }}" class="btn btn-warning">
+                    <i class="fas fa-edit me-1"></i> Modifier
+                </a>
+                <form method="post" 
+                      action="{{ path('admin_articles_delete', {'id': article.id}) }}"
+                      class="d-inline-block ms-2" 
+                      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ article.id) }}">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i> Supprimer
+                    </button>
+                </form>
+            </div>
+        {% endif %}
+
+        {# Section des commentaires #}
+        <div class="comments-section mt-5">
+            <h3 class="mb-4">Commentaires ({{ article.comments|filter(c => c.isApproved)|length }})</h3>
+            
+            {# Affichage des commentaires approuvés #}
+            {% if article.comments|filter(c => c.isApproved)|length > 0 %}
+                <div class="comments-list mb-4">
+                    {% for comment in article.comments|filter(c => c.isApproved) %}
+                        <div class="comment card mb-3">
+                            <div class="card-body">
+                                <div class="comment-meta d-flex justify-content-between mb-2">
+                                    <div>
+                                        <strong>
+                                            {% if comment.author %}
+                                                {{ comment.author.username }}
+                                            {% else %}
+                                                {{ comment.commentAuthor|default('Anonyme') }}
+                                            {% endif %}
+                                        </strong>
+                                        <small class="text-muted ms-2">
+                                            {{ comment.createdAt|date('d/m/Y H:i') }}
+                                        </small>
+                                    </div>
+                                    
+                                    {% if is_granted('ROLE_ADMIN') or (app.user and app.user == comment.author) %}
+                                        <div class="comment-actions">
+                                            <a href="{{ path('app_comment_edit', {'id': comment.id}) }}" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form method="post" action="{{ path('app_comment_delete', {'id': comment.id}) }}" class="d-inline-block ms-1" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?');">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ comment.id) }}">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="comment-content">
+                                    {{ comment.content|nl2br }}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-light mb-4">
+                    Aucun commentaire pour le moment. Soyez le premier à commenter !
+                </div>
+            {% endif %}
+            
+            {# Formulaire d'ajout de commentaire #}
+            <div class="comment-form-container">
+                <h4 class="mb-3">Ajouter un commentaire</h4>
+                
+                {% for message in app.flashes('success') %}
+                    <div class="alert alert-success">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+                
+                {% if app.user %}
+                    {{ form_start(comment_form, {'attr': {'class': 'needs-validation'}}) }}
+                        <div class="mb-3">
+                            {{ form_widget(comment_form.content) }}
+                            {% if comment_form.content.vars.errors|length > 0 %}
+                                <div class="invalid-feedback d-block">
+                                    {{ comment_form.content.vars.errors[0].message }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-1"></i> Envoyer
+                        </button>
+                    {{ form_end(comment_form) }}
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-1"></i> Vous devez être <a href="{{ path('app_login') }}">connecté</a> pour laisser un commentaire.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <a href="{{ path('app_home') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Retour à l'accueil
+            </a>
+        </div>
+    </div>
+{% endblock %}

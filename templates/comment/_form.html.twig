@@ -1,0 +1,21 @@
+{{ form_start(form, {'attr': {'class': 'mt-3 needs-validation', 'novalidate': 'novalidate'}}) }}
+    <div class="mb-3">
+        {{ form_label(form.content) }}
+        {{ form_widget(form.content) }}
+        {{ form_errors(form.content) }}
+        <div class="form-text">
+            Votre commentaire sera visible publiquement.
+        </div>
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.article) }}
+        {{ form_widget(form.article) }}
+        {{ form_errors(form.article) }}
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        <i class="fas fa-paper-plane me-1"></i> 
+        {{ button_label|default('Publier le commentaire') }}
+    </button>
+{{ form_end(form) }}

@@ -1,0 +1,8 @@
+App\Entity\Category:
+    attributes:
+        id:
+            groups: ['category:read']
+        name:
+            groups: ['category:read', 'category:write']
+        articles:
+            groups: ['category:read']

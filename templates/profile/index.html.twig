@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon Profil{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h1 class="h3 mb-0">Mon Profil</h1>
+                    </div>
+                    <div class="card-body">
+                        {% for message in app.flashes('success') %}
+                            <div class="alert alert-success">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="text-center mb-3">
+                                    <i class="fas fa-user-circle fa-5x text-primary"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <h2 class="h4 mb-3">{{ user.username }}</h2>
+                                <p><i class="fas fa-envelope me-2"></i>{{ user.email }}</p>
+                                <p><i class="fas fa-newspaper me-2"></i>{{ user.articles|length }} articles publiés</p>
+                                <p>
+                                    <i class="fas fa-user-shield me-2"></i>
+                                    Rôle : 
+                                    {% if 'ROLE_ADMIN' in user.roles %}
+                                        Administrateur
+                                    {% else %}
+                                        Utilisateur
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{{ path('app_profile_edit') }}" class="btn btn-primary">
+                                <i class="fas fa-edit me-1"></i> Modifier mon profil
+                            </a>
+                            <a href="{{ path('app_article_index') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Retour aux articles
+                            </a>
+                        </div>
+
+                        {% if user.articles|length > 0 %}
+                            <div class="mt-4">
+                                <h3 class="h4 mb-3">Mes derniers articles</h3>
+                                <div class="list-group">
+                                    {% for article in user.articles|slice(0, 5) %}
+                                        <a href="{{ path('app_article_show', {'id': article.id}) }}" class="list-group-item list-group-item-action">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h5 class="mb-1">{{ article.title }}</h5>
+                                                <small>{{ article.createdAt|date('d/m/Y') }}</small>
+                                            </div>
+                                            <p class="mb-1">{{ article.content|striptags|slice(0, 100) }}...</p>
+                                            <small>{{ article.categories|length }} catégorie(s)</small>
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                                {% if user.articles|length > 5 %}
+                                    <div class="text-center mt-3">
+                                        <a href="#" class="btn btn-outline-primary btn-sm">Voir tous mes articles</a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
