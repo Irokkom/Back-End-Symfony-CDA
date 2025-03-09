@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     environment {
-        GIT_REPO = "https://github.com/hmicn/certif-bookapp.git"
+        GIT_REPO = "https://github.com/Irokkom/Back-End-Symfony-CDA.git"
         GIT_BRANCH = "main"
-        DEPLOY_DIR = "web022"
+        DEPLOY_DIR = "web019"
     }
 
     stages {
