@@ -42,15 +42,6 @@ pipeline {
                 }
             }
         }
-
-        stage('Reset de la base de production') {
-            steps {
-                dir("${DEPLOY_DIR}") {
-                    sh 'php bin/console doctrine:database:drop --if-exists --force --env=prod'
-                    sh 'php bin/console doctrine:database:create --if-not-exists --env=prod'
-                }
-            }
-        }
         
         stage('Migration de la base de production') {
             steps {
@@ -91,8 +82,7 @@ pipeline {
             }
         }
         
-        // Désactivation temporaire des tests pour permettre le déploiement
-        /*
+
         stage('Tests') {
             steps {
                 dir("${DEPLOY_DIR}") {
@@ -100,7 +90,6 @@ pipeline {
                 }
             }
         }
-        */
 
         stage('Déploiement') {
             steps {
