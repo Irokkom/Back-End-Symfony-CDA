@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Repository\ArticleRepository;
 use App\Repository\CategoryRepository;
+use App\Service\MongoDBService;
 use App\Service\SearchService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,13 +16,17 @@ class HomeController extends AbstractController
     public function __construct(
         private readonly ArticleRepository $articleRepository,
         private readonly CategoryRepository $categoryRepository,
-        private readonly SearchService $searchService
+        private readonly SearchService $searchService,
+        private readonly MongoDBService $mongoDBService
     ) {}
 
     // Route définissant la page d'accueil ('/') avec le nom 'app_home'
     #[Route('/', name: 'app_home')]
     public function index(Request $request): Response
     {
+        // Enregistrer la visite dans MongoDB
+        $this->mongoDBService->insertVisit('home_page');
+        
         //  Utiliser le service de recherche pour gérer la soumission du formulaire de recherche
         $search = $this->searchService->handleSearchForm($request, 'app_home');
     
