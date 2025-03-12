@@ -18,11 +18,11 @@ pipeline {
                 dir("${DEPLOY_DIR}") {
                     script {
                         // Modifier directement le fichier .env pour éviter les problèmes de priorité
-                        sh """
-                            sed -i 's|DATABASE_URL="mysql://ChangeHere:@127.0.0.1:3306/ChangeHere?serverVersion=9.1.0&charset=utf8mb4"|DATABASE_URL="mysql://root:routitop@127.0.0.1:3306/${DEPLOY_DIR}?serverVersion=8.3.0&charset=utf8mb4"|' .env
-                            sed -i 's|APP_ENV=.*|APP_ENV=prod|' .env
-                            sed -i 's|APP_DEBUG=.*|APP_DEBUG=1|' .env
-                        """
+                        // sh """
+                        //     sed -i 's|DATABASE_URL="mysql://ChangeHere:@127.0.0.1:3306/ChangeHere?serverVersion=9.1.0&charset=utf8mb4"|DATABASE_URL="mysql://root:routitop@127.0.0.1:3306/${DEPLOY_DIR}?serverVersion=8.3.0&charset=utf8mb4"|' .env
+                        //     sed -i 's|APP_ENV=.*|APP_ENV=prod|' .env
+                        //     sed -i 's|APP_DEBUG=.*|APP_DEBUG=1|' .env
+                        // """
                         
                         // Créer également un .env.local pour plus de sécurité
                         sh """
@@ -34,11 +34,34 @@ pipeline {
                 }
             }
         }
+        stage('Configuration de l\'environnement de test') {
+            steps {
+                dir("${DEPLOY_DIR}") {
+                    script {
+                        def envTestFile = "${DEPLOY_DIR}/.env.test"
+                        def dbUrl = "DATABASE_URL=mysql://root:routitop@127.0.0.1:3306/${DEPLOY_DIR}?serverVersion=8.3.0&charset=utf8mb4"
+
+                        sh """
+                            if [ ! -f .env.test ]; then
+                                touch .env.test
+                            fi
+
+                            if grep -q '^DATABASE_URL=' .env.test; then
+                                sed -i 's|^DATABASE_URL=.*|${dbUrl}|' .env.test
+                            else
+                                echo '${dbUrl}' >> .env.test
+                            fi
+                        """
+                    }
+                }
+            }
+        }
 
         stage('Installation des dépendances') {
             steps {
                 dir("${DEPLOY_DIR}") {
                     sh 'composer install --optimize-autoloader'
+                    sh 'composer require symfony/apache-pack'
                 }
             }
         }
@@ -59,30 +82,8 @@ pipeline {
             }
         }
         
-        stage('Correction des tests') {
-            steps {
-                dir("${DEPLOY_DIR}") {
-                    // Déplacer les tests dans le bon répertoire selon PSR-4
-                    sh '''
-                        mkdir -p tests/Controller tests/Service tests/Integration
-                        
-                        if [ -f tests/HomeControllerTest.php ]; then
-                            mv tests/HomeControllerTest.php tests/Controller/
-                        fi
-                        
-                        if [ -f tests/MongoDBServiceTest.php ]; then
-                            mv tests/MongoDBServiceTest.php tests/Service/
-                        fi
-                        
-                        if [ -f tests/HomeControllerMongoDBIntegrationTest.php ]; then
-                            mv tests/HomeControllerMongoDBIntegrationTest.php tests/Integration/
-                        fi
-                    '''
-                }
-            }
-        }
-        
 
+        
         stage('Tests') {
             steps {
                 dir("${DEPLOY_DIR}") {
