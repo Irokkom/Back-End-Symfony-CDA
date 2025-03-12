@@ -21,6 +21,7 @@ pipeline {
                     def envLocal = """
 APP_ENV=prod
 APP_DEBUG=1
+APP_SECRET=a67f452a7c0cdcb2e2f58f4cbb6f5c82
 DATABASE_URL=mysql://root:routitop@127.0.0.1:3306/${DEPLOY_DIR}?serverVersion=8.3.0&charset=utf8mb4
                     """.stripIndent()
 
