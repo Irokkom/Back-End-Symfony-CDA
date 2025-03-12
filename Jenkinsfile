@@ -98,58 +98,6 @@ pipeline {
             steps {
                 dir("${DEPLOY_DIR}") {
                     sh 'php bin/console assets:install --env=prod'
-                    sh 'chmod -R 755 public/'
-                    sh 'chmod -R 777 var/'
-                    sh 'chmod -R 777 public/.htaccess'
-                }
-            }
-        }
-        
-        stage('Configuration Apache') {
-            steps {
-                script {
-                    // Assurez-vous que le répertoire de déploiement est accessible par Apache
-                    sh "chmod -R 755 ${DEPLOY_DIR}"
-                    
-                    // Créer un fichier VirtualHost pour Apache si nécessaire
-                    sh """
-                        echo '<VirtualHost *:80>
-                            ServerName web019.azure.certif.academy
-                            ServerAlias web019.azure.certif.academy
-                            DocumentRoot /var/lib/jenkins/workspace/web019/public
-                            
-                            <Directory /var/lib/jenkins/workspace/web019/public>
-                                AllowOverride All
-                                Require all granted
-                                Options Indexes FollowSymLinks MultiViews
-                                FallbackResource /index.php
-                            </Directory>
-                            
-                            # Uncomment the following lines if you install assets as symlinks
-                            # or if you experience problems related to symlinks when compiling LESS/Sass/CoffeeScript assets
-                            <Directory /var/lib/jenkins/workspace/web019>
-                                Options FollowSymLinks
-                            </Directory>
-                            
-                            ErrorLog \${APACHE_LOG_DIR}/web019_error.log
-                            CustomLog \${APACHE_LOG_DIR}/web019_access.log combined
-                        </VirtualHost>' > /tmp/web019.conf
-                        
-                        sudo cp /tmp/web019.conf /etc/apache2/sites-available/web019.conf
-                        sudo a2ensite web019.conf
-                        sudo a2enmod rewrite
-                        sudo a2enmod headers
-                        sudo systemctl restart apache2
-                        
-                        # Vérifier les erreurs Apache
-                        sudo tail -n 50 /var/log/apache2/error.log
-                        sudo tail -n 50 /var/log/apache2/web019_error.log || echo "Le fichier de log n'existe pas encore"
-                        
-                        # Créer un lien symbolique vers le répertoire public si nécessaire
-                        if [ ! -L /var/www/html/web019 ]; then
-                            sudo ln -sf /var/lib/jenkins/workspace/web019/public /var/www/html/web019
-                        fi
-                    """
                 }
             }
         }
