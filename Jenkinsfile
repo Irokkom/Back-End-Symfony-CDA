@@ -98,6 +98,36 @@ pipeline {
             steps {
                 dir("${DEPLOY_DIR}") {
                     sh 'php bin/console assets:install --env=prod'
+                    
+                    // S'assurer que le fichier .htaccess est bien présent et visible
+                    sh 'ls -la public/'
+                    sh 'cat public/.htaccess'
+                    
+                    // Créer un fichier de configuration Apache pour le site
+                    sh '''
+                        echo "<VirtualHost *:80>
+                            ServerName web019.azure.certif.academy
+                            DocumentRoot /var/lib/jenkins/workspace/web019/public
+                            
+                            <Directory /var/lib/jenkins/workspace/web019/public>
+                                AllowOverride All
+                                Require all granted
+                                
+                                FallbackResource /index.php
+                            </Directory>
+                            
+                            ErrorLog /var/log/apache2/web019_error.log
+                            CustomLog /var/log/apache2/web019_access.log combined
+                        </VirtualHost>" > /tmp/web019-vhost.conf
+                    '''
+                    
+                    // Copier le fichier de configuration et redémarrer Apache (nécessite des droits sudo)
+                    sh '''
+                        if [ -f /tmp/web019-vhost.conf ]; then
+                            echo "Fichier de configuration Apache créé"
+                            echo "IMPORTANT: Copiez manuellement ce fichier dans /etc/apache2/sites-available/ et activez-le avec a2ensite"
+                        fi
+                    '''
                 }
             }
         }
