@@ -12,7 +12,8 @@ framework:
         gc_maxlifetime: 3600
         gc_probability: 1
         gc_divisor: 100
-
+        save_path: '%kernel.project_dir%/var/sessions/%kernel.environment%'
+    
     php_errors:
         log: true
         

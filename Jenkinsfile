@@ -78,6 +78,8 @@ pipeline {
             steps {
                 dir("${DEPLOY_DIR}") {
                     sh 'php bin/console cache:clear --env=prod'
+                    sh 'mkdir -p var/sessions/prod var/sessions/dev var/sessions/test'
+                    sh 'chmod -R 777 var/sessions'
                 }
             }
         }
