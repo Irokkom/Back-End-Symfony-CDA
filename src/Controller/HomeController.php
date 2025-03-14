@@ -33,8 +33,10 @@ class HomeController extends AbstractController
         // Récupère les résultats de la recherche (si disponibles)
         $searchResults = $search['results'];
     
-        // Récupère les 4 derniers articles pour le carrousel
-        $featuredArticles = $this->articleRepository->findLatest(4);
+        // Récupère les 4 derniers articles pour le carrousel seulement s'il n'y a pas de résultats de recherche
+        $featuredArticles = empty($searchResults) 
+            ? $this->articleRepository->findLatest(4)
+            : [];
         
         // Récupère les 6 articles suivants pour la section "Articles récents"
         $latestArticles = empty($searchResults) 
