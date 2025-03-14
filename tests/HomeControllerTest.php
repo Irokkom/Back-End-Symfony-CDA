@@ -62,7 +62,7 @@ class HomeControllerTest extends TestCase
         $this->articleRepository
             ->expects($this->once())
             ->method('findLatest')
-            ->with(6)
+            ->with(4)
             ->willReturn([]);
             
         $this->categoryRepository

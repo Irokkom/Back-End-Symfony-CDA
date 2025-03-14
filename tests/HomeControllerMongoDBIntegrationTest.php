@@ -80,7 +80,7 @@ class HomeControllerMongoDBIntegrationTest extends TestCase
         $this->articleRepository
             ->expects($this->once())
             ->method('findLatest')
-            ->with(6)
+            ->with(4)
             ->willReturn([]);
             
         // Configuration du mock CategoryRepository
