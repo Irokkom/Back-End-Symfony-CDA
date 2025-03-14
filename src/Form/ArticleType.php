@@ -34,7 +34,8 @@ class ArticleType extends AbstractType
                 'attr' => [
                     'class' => 'form-control',
                     'rows' => 10,
-                    'minlength' => 10
+                    'minlength' => 10,
+                    'placeholder' => ''
                 ]
             ])
             ->add('categories', EntityType::class, [

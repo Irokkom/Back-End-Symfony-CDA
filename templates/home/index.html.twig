@@ -4,21 +4,67 @@
 
 {% block body %}
 <div class="container py-4">
-    <!-- Section Hero avec l'article en vedette - Déplacée au-dessus de la barre de recherche -->
-    {% if featured_article %}
-        <div class="bg-image mb-5">
-            <div class="container text-center py-5">
-                <h1 class="display-3 fw-bold mb-3">{{ featured_article.title }}</h1>
-                <p class="lead mb-4 col-md-8 mx-auto">{{ featured_article.content|striptags|slice(0, 200) }}...</p>
-                <div class="mb-4">
-                    {% for category in featured_article.categories %}
-                        <span class="badge bg-primary me-2 category-badge">{{ category.name }}</span>
+    <!-- Section Hero avec carrousel des articles en vedette -->
+    {% if featured_article is defined %}
+        <div id="featuredCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                {% if featured_articles is defined and featured_articles|length > 0 %}
+                    {% for article in featured_articles %}
+                        <button type="button" data-bs-target="#featuredCarousel" data-bs-slide-to="{{ loop.index0 }}" {% if loop.first %}class="active" aria-current="true"{% endif %} aria-label="Slide {{ loop.index }}"></button>
                     {% endfor %}
-                </div>
-                <a href="{{ path('app_article_show', {'id': featured_article.id}) }}" class="btn btn-light btn-lg">
-                    <i class="fas fa-book-open me-1"></i> Lire l'article
-                </a>
+                {% else %}
+                    <button type="button" data-bs-target="#featuredCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                {% endif %}
             </div>
+            
+            <div class="carousel-inner">
+                {% if featured_articles is defined and featured_articles|length > 0 %}
+                    {% for article in featured_articles %}
+                        <div class="carousel-item {% if loop.first %}active{% endif %}">
+                            <div class="featured-article bg-primary text-white text-center py-5" {% if article.medias|length > 0 %}style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), url('{{ asset(article.medias|first.url) }}') no-repeat center center; background-size: cover;"{% endif %}>
+                                <div class="container py-5">
+                                    <h1 class="display-3 fw-bold mb-3">{{ article.title }}</h1>
+                                    <p class="lead mb-4 col-md-8 mx-auto">{{ article.content|striptags|slice(0, 200) }}...</p>
+                                    <div class="mb-4">
+                                        {% for category in article.categories %}
+                                            <span class="badge bg-light text-primary me-2 category-badge">{{ category.name }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    <a href="{{ path('app_article_show', {'id': article.id}) }}" class="btn btn-light btn-lg">
+                                        <i class="fas fa-book-open me-1"></i> Lire l'article
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="carousel-item active">
+                        <div class="featured-article bg-primary text-white text-center py-5" {% if featured_article.medias|length > 0 %}style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), url('{{ asset(featured_article.medias|first.url) }}') no-repeat center center; background-size: cover;"{% endif %}>
+                            <div class="container py-5">
+                                <h1 class="display-3 fw-bold mb-3">{{ featured_article.title }}</h1>
+                                <p class="lead mb-4 col-md-8 mx-auto">{{ featured_article.content|striptags|slice(0, 200) }}...</p>
+                                <div class="mb-4">
+                                    {% for category in featured_article.categories %}
+                                        <span class="badge bg-light text-primary me-2 category-badge">{{ category.name }}</span>
+                                    {% endfor %}
+                                </div>
+                                <a href="{{ path('app_article_show', {'id': featured_article.id}) }}" class="btn btn-light btn-lg">
+                                    <i class="fas fa-book-open me-1"></i> Lire l'article
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <button class="carousel-control-prev" type="button" data-bs-target="#featuredCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Précédent</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#featuredCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Suivant</span>
+            </button>
         </div>
     {% else %}
         <!-- Hero de remplacement si pas d'article en vedette -->
@@ -41,51 +87,7 @@
     {% endif %}
 
     <!-- Barre de recherche améliorée - Déplacée après la section Hero -->
-    <div class="search-navbar bg-light p-3 rounded mb-4">
-        {{ form_start(search_form, {'attr': {'class': 'search-form'}}) }}
-            <!-- Barre de recherche principale -->
-            <div class="mb-3">
-                {{ form_widget(search_form.query, {'attr': {'placeholder': 'Rechercher un article par titre, contenu ou catégorie...'}}) }}
-                <button type="submit" class="btn btn-primary search-btn">
-                    <i class="fas fa-search"></i>
-                </button>
-            </div>
-            
-            <!-- Filtres alignés -->
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="mb-2">
-                        <label class="form-label fw-bold">Catégorie</label>
-                        {{ form_widget(search_form.category) }}
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="mb-2">
-                        <label class="form-label fw-bold">Date de début</label>
-                        {{ form_widget(search_form.dateFrom) }}
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="mb-2">
-                        <label class="form-label fw-bold">Date de fin</label>
-                        {{ form_widget(search_form.dateTo) }}
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Boutons alignés à droite -->
-            <div class="d-flex justify-content-end mt-3">
-                <a href="{{ path('app_home') }}" class="btn btn-outline-secondary me-2">
-                    <i class="fas fa-times me-1"></i> Réinitialiser les filtres
-                </a>
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-filter me-1"></i> Filtrer
-                </button>
-            </div>
-        {{ form_end(search_form) }}
-    </div>
+    {% include 'partials/_search_bar.html.twig' %}
 
     <div class="container">
         <div class="row">

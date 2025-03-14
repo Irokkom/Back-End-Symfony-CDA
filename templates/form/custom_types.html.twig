@@ -1,6 +1,6 @@
 {% block textarea_widget %}
     <div class="form-floating">
-        {{ form_widget(form, {'attr': {'class': 'form-control', 'style': 'height: 150px'}}) }}
+        {{ form_widget(form, {'attr': {'class': 'form-control', 'style': 'height: 150px', 'placeholder': ' '}}) }}
         {{ form_label(form) }}
     </div>
     {{ form_errors(form) }}
@@ -8,7 +8,7 @@
 
 {% block text_widget %}
     <div class="form-floating">
-        {{ form_widget(form, {'attr': {'class': 'form-control'}}) }}
+        {{ form_widget(form, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
         {{ form_label(form) }}
     </div>
     {{ form_errors(form) }}
@@ -16,7 +16,7 @@
 
 {% block email_widget %}
     <div class="form-floating">
-        {{ form_widget(form, {'attr': {'class': 'form-control'}}) }}
+        {{ form_widget(form, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
         {{ form_label(form) }}
     </div>
     {{ form_errors(form) }}
@@ -24,7 +24,7 @@
 
 {% block password_widget %}
     <div class="form-floating">
-        {{ form_widget(form, {'attr': {'class': 'form-control'}}) }}
+        {{ form_widget(form, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
         {{ form_label(form) }}
     </div>
     {{ form_errors(form) }}

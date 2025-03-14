@@ -282,6 +282,64 @@
     margin-bottom: 2rem;
 }
 
+/* Sticky Footer - Assure que le footer est toujours en bas de la page */
+html {
+    position: relative;
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    /* Ajouter un padding-bottom pour éviter que le footer ne chevauche le contenu */
+    padding-bottom: 300px;
+}
+
+footer.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background-color: var(--darker-bg);
+    color: #fff;
+    /* Assurer que le footer touche bien le bas de la page */
+    left: 0;
+    right: 0;
+    z-index: 10;
+}
+
+footer.footer h5 {
+    color: #fff;
+    font-weight: 600;
+    margin-bottom: 1.2rem;
+}
+
+footer.footer ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+footer.footer ul li {
+    margin-bottom: 0.5rem;
+}
+
+footer.footer a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+footer.footer a:hover {
+    color: var(--primary-light);
+    text-decoration: none;
+}
+
+footer.footer hr {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
 /* Footer */
 .footer {
     background-color: var(--dark-bg);

@@ -72,6 +72,23 @@ class ArticleRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    
+    /**
+     * @return Article[] Returns an array of latest articles excluding the specified IDs
+     */
+    public function findLatestExcept(int $limit = 6, array $excludeIds = []): array
+    {
+        $qb = $this->createBaseQueryBuilder(true);
+        
+        if (!empty($excludeIds)) {
+            $qb->andWhere('a.id NOT IN (:excludeIds)')
+               ->setParameter('excludeIds', $excludeIds);
+        }
+        
+        return $qb->setMaxResults($limit)
+                 ->getQuery()
+                 ->getResult();
+    }
 
     /**
      * @return Article[] Returns an array of articles by category name

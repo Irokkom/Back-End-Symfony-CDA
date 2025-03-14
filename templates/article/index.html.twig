@@ -45,53 +45,8 @@
                     </div>
 
                     <!-- Barre de recherche avec filtres avancés -->
-                    <div class="search-navbar mt-3 bg-light p-3 rounded">
-                        {{ form_start(search_form, {'attr': {'class': 'search-form'}}) }}
-                            <!-- Barre de recherche principale -->
-                            <div class="mb-3">
-                                {{ form_widget(search_form.query, {'attr': {'placeholder': 'Rechercher un article par titre, contenu ou catégorie...'}}) }}
-                                <button type="submit" class="btn btn-primary search-btn">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-                            
-                            <!-- Filtres alignés -->
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="mb-2">
-                                        <label class="form-label fw-bold">Catégorie</label>
-                                        {{ form_widget(search_form.category) }}
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-4">
-                                    <div class="mb-2">
-                                        <label class="form-label fw-bold">Date de début</label>
-                                        {{ form_widget(search_form.dateFrom) }}
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-4">
-                                    <div class="mb-2">
-                                        <label class="form-label fw-bold">Date de fin</label>
-                                        {{ form_widget(search_form.dateTo) }}
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Boutons alignés à droite -->
-                            <div class="d-flex justify-content-end mt-3">
-                                <a href="{{ path('app_article_index') }}" class="btn btn-outline-secondary me-2">
-                                    <i class="fas fa-times me-1"></i> Réinitialiser les filtres
-                                </a>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-filter me-1"></i> Filtrer
-                                </button>
-                            </div>
-                        {{ form_end(search_form) }}
-                    </div>
+                    {% include 'partials/_search_bar.html.twig' %}
 
-                    <!-- Liste des articles -->
                     <div class="mt-4">
                         {% if articles|length > 0 %}
                             <div class="row row-cols-1 row-cols-md-2 g-4">
@@ -146,19 +101,49 @@
         }
         
         .search-form input[type="search"] {
-            padding-right: 40px;
+            border-radius: 4px;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            border-right: none;
         }
         
         .search-form .search-btn {
             position: absolute;
-            right: 5px;
-            top: 5px;
-            border-radius: 4px;
-            padding: 6px 12px;
+            right: 0;
+            top: 0;
+            border-radius: 0 4px 4px 0;
+            height: 42px;
+            width: 42px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #0d6efd;
+            color: white;
+            border: none;
         }
         
         .search-form .mb-3 {
             position: relative;
+            display: flex;
+        }
+        
+        /* Style uniforme pour les champs de date et catégorie */
+        .search-form select,
+        .search-form input[type="date"] {
+            height: 42px;
+            border-radius: 4px;
+            width: 100%;
+            padding: 8px 12px;
+            background-color: white;
+            border: 1px solid #e9ecef;
+        }
+        
+        /* Assurer que tous les libellés ont la même apparence */
+        .search-form .form-label {
+            margin-bottom: 5px;
+            display: block;
+            font-size: 14px;
         }
     </style>
 {% endblock %}

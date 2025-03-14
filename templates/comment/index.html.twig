@@ -24,7 +24,12 @@
                         <td>{{ comment.content|length > 50 ? comment.content|slice(0, 50) ~ '...' : comment.content }}</td>
                         <td>{{ comment.createdAt|date('d/m/Y H:i') }}</td>
                         <td>
-                            <i class="fas fa-user"></i> {{ comment.commentAuthor }}
+                            <i class="fas fa-user"></i> 
+                            {% if comment.author %}
+                                {{ comment.author.username }}
+                            {% else %}
+                                Anonyme
+                            {% endif %}
                         </td>
                         <td>
                             {% if comment.article %}
@@ -60,8 +65,8 @@
             </tbody>
         </table>
 
-        <a href="{{ path('app_comment_new') }}" class="btn btn-success">
-            <i class="fas fa-plus"></i> Créer un nouveau commentaire
+        <a href="{{ path('app_home') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Retour à l'accueil
         </a>
     </div>
 {% endblock %}

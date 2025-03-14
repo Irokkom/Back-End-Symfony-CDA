@@ -33,27 +33,23 @@ class HomeController extends AbstractController
         // Récupère les résultats de la recherche (si disponibles)
         $searchResults = $search['results'];
     
-        //  Si aucun résultat de recherche, on récupère les 6 derniers articles publiés
+        // Récupère les 4 derniers articles pour le carrousel
+        $featuredArticles = $this->articleRepository->findLatest(4);
+        
+        // Récupère les 6 articles suivants pour la section "Articles récents"
         $latestArticles = empty($searchResults) 
-            ? $this->articleRepository->findLatest(6) 
+            ? $this->articleRepository->findLatestExcept(6, array_map(fn($article) => $article->getId(), $featuredArticles)) 
             : [];
 
         //  Récupérer toutes les catégories avec leurs articles associés
         $categories = $this->categoryRepository->findAllWithArticles();
 
-        //  Récupérer l'article le plus récent pour l'afficher en "article en avant"
-        $featuredArticle = !empty($latestArticles) ? $latestArticles[0] : null;
-    
-        //  Si un article en avant est défini, on le retire de la liste des derniers articles
-        if ($featuredArticle) {
-            array_shift($latestArticles); // Retire le premier élément du tableau
-        }
-
         //  Rendu de la vue Twig avec les données récupérées
         return $this->render('home/index.html.twig', [
-            'latest_articles' => $latestArticles, // Les articles récents (hors article en avant)
+            'latest_articles' => $latestArticles, // Les articles récents (hors articles en vedette)
             'categories' => $categories, // Les catégories avec leurs articles
-            'featured_article' => $featuredArticle, // L'article en avant
+            'featured_articles' => $featuredArticles, // Les articles en vedette pour le carrousel
+            'featured_article' => !empty($featuredArticles) ? $featuredArticles[0] : null, // Pour compatibilité
             'search_form' => $search['form']->createView(), // Le formulaire de recherche
             'search_results' => $searchResults, // Les résultats de la recherche
         ]);

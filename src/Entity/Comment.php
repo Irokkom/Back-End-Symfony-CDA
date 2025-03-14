@@ -23,10 +23,6 @@ class Comment
     #[Groups(['comment:read'])]
     private ?string $content = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['comment:read'])]
-    private ?string $commentAuthor = null;
-
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Groups(['comment:read'])]
     private ?\DateTimeInterface $createdAt = null;
@@ -48,6 +44,7 @@ class Comment
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'comments')]
     #[ORM\JoinColumn(name: "author", nullable: true)]
+    #[Groups(['comment:read'])]
     private ?User $author = null;
 
     public function __construct()
@@ -74,18 +71,6 @@ class Comment
     public function setContent(string $content): static
     {
         $this->content = $content;
-
-        return $this;
-    }
-
-    public function getCommentAuthor(): ?string
-    {
-        return $this->commentAuthor;
-    }
-
-    public function setCommentAuthor(?string $commentAuthor): static
-    {
-        $this->commentAuthor = $commentAuthor;
 
         return $this;
     }

@@ -52,7 +52,8 @@ class ArticleController extends AbstractController
         
         // Si l'utilisateur est connecté, associer le commentaire à l'utilisateur
         if ($this->getUser()) {
-            $comment->setAuthor($this->getUser());
+            $user = $this->getUser();
+            $comment->setAuthor($user);
         }
         
         $form = $this->createForm(CommentType::class, $comment);
