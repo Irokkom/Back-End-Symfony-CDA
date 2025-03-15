@@ -5,6 +5,8 @@ pipeline {
         GIT_REPO = "https://github.com/Irokkom/Back-End-Symfony-CDA.git"
         GIT_BRANCH = "main"
         DEPLOY_DIR = 'web019'
+                // Assure-toi que ton token SonarQube est défini en tant que variable d'environnement via Jenkins ou un credential
+        // SONARQUBE_TOKEN = 'sqp_8f95f7383c31f3f1ceba0978b79186edf183497b'
     }
 
     stages {
