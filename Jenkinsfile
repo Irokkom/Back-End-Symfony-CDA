@@ -88,6 +88,27 @@ DATABASE_URL=mysql://root:routitop@127.0.0.1:3306/${DEPLOY_DIR}?serverVersion=8.
                 }
             }
         }
+                // Nouvelle étape SonarQube Analysis
+        // stage('Analyse SonarQube') {
+        //     steps {
+                  // Le nom 'MySonarQubeServer' doit correspondre à celui configuré dans Manage Jenkins > Configure System
+        //         withSonarQubeEnv('MySonarQubeServer') {
+        //             dir("${DEPLOY_DIR}") {
+        //                 sh """
+        //                     sonar-scanner \
+        //                     -Dsonar.projectKey=mon_projet_symfony \
+        //                     -Dsonar.projectName="MonProjet Symfony" \
+        //                     -Dsonar.projectVersion=1.0 \
+        //                     -Dsonar.sources=src \
+        //                     -Dsonar.exclusions=vendor/**,tests/** \
+        //                     -Dsonar.host.url=http://localhost:9000 \
+        //                     -Dsonar.login=${SONARQUBE_TOKEN} \
+        //                     -Dsonar.password=
+        //                 """
+        //             }
+        //         }
+        //     }
+        // }
 
         stage('Déploiement') {
             steps {
