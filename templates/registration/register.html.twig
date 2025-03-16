@@ -86,7 +86,7 @@
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="{{ registrationForm.agreeTerms.vars.id }}" name="{{ registrationForm.agreeTerms.vars.full_name }}" required="required">
                                     <label class="form-check-label" for="{{ registrationForm.agreeTerms.vars.id }}">
-                                        J'accepte les conditions d'utilisation
+                                        J'accepte les <a href="{{ path('app_legal_conditions') }}" target="_blank" class="link-primary">conditions d'utilisation</a>
                                     </label>
                                 </div>
                                 {{ form_errors(registrationForm.agreeTerms) }}

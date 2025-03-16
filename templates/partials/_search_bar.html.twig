@@ -1,148 +1,55 @@
-{% if search_form is defined %}
-    <div class="search-navbar mt-3 bg-light p-3 rounded">
-        {{ form_start(search_form, {'attr': {'class': 'search-form'}}) }}
-            <!-- Barre de recherche principale -->
-            <div class="mb-3">
-                {{ form_widget(search_form.query, {'attr': {'placeholder': 'Rechercher un article par titre, contenu ou catégorie...'}}) }}
-                <button type="submit" class="btn btn-primary search-btn">
-                    <i class="fas fa-search"></i>
-                </button>
-            </div>
-            
-            <!-- Filtres alignés -->
-            <div class="row">
-                {% if search_form.category is defined %}
-                <div class="col-md-4">
-                    <div class="mb-2">
-                        <label class="form-label fw-bold">Catégorie</label>
-                        {{ form_widget(search_form.category) }}
-                    </div>
-                </div>
-                {% endif %}
-                
-                {% if search_form.dateFrom is defined %}
-                <div class="col-md-4">
-                    <div class="mb-2">
-                        <label class="form-label fw-bold">Date de début</label>
-                        {{ form_widget(search_form.dateFrom) }}
-                    </div>
-                </div>
-                {% endif %}
-                
-                {% if search_form.dateTo is defined %}
-                <div class="col-md-4">
-                    <div class="mb-2">
-                        <label class="form-label fw-bold">Date de fin</label>
-                        {{ form_widget(search_form.dateTo) }}
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-            
-            <!-- Boutons -->
-            <div class="d-flex justify-content-end mt-3">
-                {% if search_form.reset is defined %}
-                    <button type="button" class="btn btn-outline-secondary me-2" id="reset-filters">
-                        <i class="fas fa-undo me-1"></i> Réinitialiser les filtres
-                    </button>
-                {% else %}
-                    <a href="{{ path(app.request.attributes.get('_route')) }}" class="btn btn-outline-secondary me-2">
-                        <i class="fas fa-undo me-1"></i> Réinitialiser les filtres
-                    </a>
-                {% endif %}
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-filter me-1"></i> Filtrer
-                </button>
-            </div>
-        {{ form_end(search_form) }}
+{% if form is defined %}
+<!-- Formulaire de recherche avancée -->
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-filter me-2"></i> Recherche avancée
+        </h5>
     </div>
+    <div class="card-body">
+        {{ form_start(form, {'method': 'GET', 'attr': {'id': 'search-form'}, 'action': path('app_search')}) }}
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                {{ form_row(form.query) }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form_row(form.category) }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                {{ form_row(form.dateFrom) }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form_row(form.dateTo) }}
+            </div>
+        </div>
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search me-2"></i> Rechercher
+            </button>
+            <button type="button" id="resetForm" class="btn btn-outline-secondary">
+                <i class="fas fa-redo me-2"></i> Réinitialiser
+            </button>
+        </div>
+        {{ form_end(form) }}
+    </div>
+</div>
 
-    <style>
-        .search-navbar {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-        }
-        
-        .search-form .form-control,
-        .search-form .form-select {
-            border-color: #e9ecef;
-            border-radius: 4px;
-            height: 42px;
-        }
-        
-        .search-form input[type="search"] {
-            border-radius: 4px;
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 0;
-            border-right: none;
-        }
-        
-        .search-form .search-btn {
-            position: absolute;
-            right: 0;
-            top: 0;
-            border-radius: 0 4px 4px 0;
-            height: 42px;
-            width: 42px;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #0d6efd;
-            color: white;
-            border: none;
-        }
-        
-        .search-form .mb-3 {
-            position: relative;
-            display: flex;
-        }
-        
-        /* Style uniforme pour les champs de date et catégorie */
-        .search-form select,
-        .search-form input[type="date"] {
-            height: 42px;
-            border-radius: 4px;
-            width: 100%;
-            padding: 8px 12px;
-            background-color: white;
-            border: 1px solid #e9ecef;
-        }
-        
-        /* Assurer que tous les libellés ont la même apparence */
-        .search-form .form-label {
-            margin-bottom: 5px;
-            display: block;
-            font-size: 14px;
-        }
-    </style>
-
-    {% if search_form.reset is defined %}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('reset-filters').addEventListener('click', function() {
-                // Réinitialiser les champs du formulaire
-                let form = document.querySelector('.search-form');
-                let inputs = form.querySelectorAll('input:not([type="submit"]), select');
-                
-                inputs.forEach(function(input) {
-                    if (input.type === 'text' || input.type === 'search' || input.tagName === 'TEXTAREA') {
-                        input.value = '';
-                    } else if (input.type === 'date') {
-                        input.value = '';
-                    } else if (input.tagName === 'SELECT') {
-                        input.selectedIndex = 0;
-                    }
-                });
-                
-                // Soumettre le formulaire pour rafraîchir les résultats
-                form.submit();
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Réinitialiser le formulaire
+        document.getElementById('resetForm').addEventListener('click', function() {
+            document.querySelectorAll('input[type="text"], input[type="search"], input[type="date"], select').forEach(function(input) {
+                input.value = '';
             });
+            // Soumettre le formulaire vide
+            this.closest('form').submit();
         });
-    </script>
-    {% endif %}
+    });
+</script>
 {% else %}
-    <div class="alert alert-warning">
-        Le formulaire de recherche n'est pas défini. Assurez-vous de passer la variable 'search_form' à ce template.
-    </div>
+<div class="alert alert-warning">
+    <i class="fas fa-exclamation-triangle me-2"></i> La variable "form" n'est pas définie. Veuillez passer un formulaire à ce partial.
+</div>
 {% endif %}

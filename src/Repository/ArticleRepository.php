@@ -18,6 +18,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ArticleRepository extends ServiceEntityRepository
 {
+    private const CATEGORY_CONDITION = 'categories = :category';
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Article::class);
@@ -25,18 +27,18 @@ class ArticleRepository extends ServiceEntityRepository
 
     /**
      * Crée un QueryBuilder de base avec les jointures communes et le tri par date
-     * @param bool $activeOnly Si true, ajoute une condition pour n'inclure que les articles actifs (non supprimés)
+     * @param bool $withJoins Si true, ajoute les jointures pour l'auteur et les catégories
      */
-    private function createBaseQueryBuilder(bool $activeOnly = false): QueryBuilder
+    private function createBaseQueryBuilder(bool $withJoins = false): QueryBuilder
     {
         $qb = $this->createQueryBuilder('a')
-            ->addSelect('author', 'categories')
-            ->leftJoin('a.author', 'author')
-            ->leftJoin('a.categories', 'categories')
-            ->orderBy('a.createdAt', Criteria::DESC);
-            
-        if ($activeOnly) {
-            $qb->andWhere('a.deletedAt IS NULL');
+            ->where('a.deletedAt IS NULL')
+            ->orderBy('a.createdAt', 'DESC');
+        
+        if ($withJoins) {
+            $qb->leftJoin('a.author', 'author')
+               ->leftJoin('a.categories', 'categories')
+               ->addSelect('author', 'categories');
         }
         
         return $qb;
@@ -47,7 +49,7 @@ class ArticleRepository extends ServiceEntityRepository
      */
     public function findAllWithAuthorsAndCategories(): array
     {
-        return $this->createBaseQueryBuilder()
+        return $this->createBaseQueryBuilder(true)
             ->getQuery()
             ->getResult();
     }
@@ -57,7 +59,7 @@ class ArticleRepository extends ServiceEntityRepository
      */
     public function findAllActive(): array
     {
-        return $this->createBaseQueryBuilder(true)
+        return $this->createBaseQueryBuilder()
             ->getQuery()
             ->getResult();
     }
@@ -67,7 +69,7 @@ class ArticleRepository extends ServiceEntityRepository
      */
     public function findLatest(int $limit = 4): array
     {
-        return $this->createBaseQueryBuilder(true)
+        return $this->createBaseQueryBuilder()
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
@@ -78,7 +80,7 @@ class ArticleRepository extends ServiceEntityRepository
      */
     public function findLatestExcept(int $limit = 6, array $excludeIds = []): array
     {
-        $qb = $this->createBaseQueryBuilder(true);
+        $qb = $this->createBaseQueryBuilder();
         
         if (!empty($excludeIds)) {
             $qb->andWhere('a.id NOT IN (:excludeIds)')
@@ -136,21 +138,27 @@ class ArticleRepository extends ServiceEntityRepository
         
         // Recherche textuelle
         if (!empty($filters['query'])) {
+            $searchTerm = '%' . $filters['query'] . '%';
             $qb->andWhere($qb->expr()->orX(
                 $qb->expr()->like('LOWER(a.title)', 'LOWER(:query)'),
                 $qb->expr()->like('LOWER(a.content)', 'LOWER(:query)'),
+                $qb->expr()->like('LOWER(author.username)', 'LOWER(:query)'),
                 'EXISTS (
                     SELECT c FROM App\Entity\Category c 
                     WHERE c MEMBER OF a.categories 
                     AND LOWER(c.name) LIKE LOWER(:query)
                 )'
             ))
-            ->setParameter('query', '%' . $filters['query'] . '%');
+            ->setParameter('query', $searchTerm);
+            
+            // Pour debugging: affichage des paramètres SQL
+            // dump($qb->getQuery()->getSQL());
+            // dump($qb->getQuery()->getParameters());
         }
         
         // Filtre par catégorie
         if (!empty($filters['category'])) {
-            $qb->andWhere('categories = :category')
+            $qb->andWhere(self::CATEGORY_CONDITION)
                ->setParameter('category', $filters['category']);
         }
         
@@ -167,6 +175,73 @@ class ArticleRepository extends ServiceEntityRepository
             $dateTo->modify('+1 day');
             
             $qb->andWhere('a.createdAt < :dateTo')
+               ->setParameter('dateTo', $dateTo);
+        }
+        
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Recherche des articles en fonction d'une requête de recherche
+     * @param string|null $query Terme de recherche
+     * @param array $criteria Critères additionnels
+     * @return Article[] Résultats de la recherche
+     */
+    public function findBySearchQuery(?string $query, array $criteria = []): array
+    {
+        $qb = $this->createBaseQueryBuilder(true);
+        
+        if ($query) {
+            $qb->andWhere('a.title LIKE :query OR a.content LIKE :query OR author.username LIKE :query')
+               ->setParameter('query', '%' . $query . '%');
+        }
+        
+        // Ajouter des critères supplémentaires si fournis
+        foreach ($criteria as $field => $value) {
+            if ($field === 'category') {
+                $qb->andWhere(self::CATEGORY_CONDITION)
+                   ->setParameter('category', $value);
+            }
+        }
+        
+        return $qb->getQuery()->getResult();
+    }
+    
+    /**
+     * Recherche avancée avec filtres de date
+     * @param string|null $query Terme de recherche
+     * @param mixed|null $category Catégorie
+     * @param mixed|null $author Auteur
+     * @param \DateTime|null $dateFrom Date de début
+     * @param \DateTime|null $dateTo Date de fin
+     * @return Article[] Résultats de la recherche avancée
+     */
+    public function findByAdvancedSearch(?string $query, $category = null, $author = null, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null): array
+    {
+        $qb = $this->createBaseQueryBuilder(true);
+        
+        if ($query) {
+            $qb->andWhere('a.title LIKE :query OR a.content LIKE :query')
+               ->setParameter('query', '%' . $query . '%');
+        }
+        
+        if ($category) {
+            $qb->andWhere(self::CATEGORY_CONDITION)
+               ->setParameter('category', $category);
+        }
+        
+        if ($author) {
+            $qb->andWhere('a.author = :author')
+               ->setParameter('author', $author);
+        }
+        
+        if ($dateFrom) {
+            $qb->andWhere('a.createdAt >= :dateFrom')
+               ->setParameter('dateFrom', $dateFrom);
+        }
+        
+        if ($dateTo) {
+            $qb->andWhere('a.createdAt <= :dateTo')
                ->setParameter('dateTo', $dateTo);
         }
         

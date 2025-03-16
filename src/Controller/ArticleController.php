@@ -5,9 +5,9 @@ namespace App\Controller;
 use App\Entity\Article;
 use App\Entity\Comment;
 use App\Form\CommentType;
+use App\Form\SearchType;
 use App\Repository\ArticleRepository;
 use App\Repository\CategoryRepository;
-use App\Service\SearchService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,23 +19,34 @@ class ArticleController extends AbstractController
     public function __construct(
         private readonly ArticleRepository $articleRepository,
         private readonly CategoryRepository $categoryRepository,
-        private readonly EntityManagerInterface $entityManager,
-        private readonly SearchService $searchService
+        private readonly EntityManagerInterface $entityManager
     ) {}
 
     #[Route('/articles', name: 'app_article_index')]
     public function index(Request $request): Response
     {
-        // Utiliser le service de recherche
-        $search = $this->searchService->handleSearchForm($request, 'app_article_index');
+        // Récupération du paramètre de recherche depuis la barre de navigation
+        $navbarQuery = $request->query->get('q');
         
-        // Si des résultats de recherche sont trouvés, les utiliser, sinon afficher tous les articles actifs
-        $articles = !empty($search['results']) ? $search['results'] : $this->articleRepository->findAllActive();
+        // Si un terme de recherche est fourni via la navbar, rediriger vers la page de recherche
+        if ($navbarQuery !== null) {
+            return $this->redirectToRoute('app_search', ['q' => $navbarQuery]);
+        }
+        
+        // Création du formulaire de recherche
+        $searchForm = $this->createForm(SearchType::class, null, [
+            'method' => 'GET',
+            'csrf_protection' => false,
+            'action' => $this->generateUrl('app_search')
+        ]);
+        
+        // Récupérer tous les articles actifs
+        $articles = $this->articleRepository->findAllActive();
 
         return $this->render('article/index.html.twig', [
             'articles' => $articles,
             'categories' => $this->categoryRepository->findAll(),
-            'search_form' => $search['form']->createView()
+            'search_form' => $searchForm->createView()
         ]);
     }
 

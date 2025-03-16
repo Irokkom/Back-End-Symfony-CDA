@@ -45,7 +45,7 @@
                     </div>
 
                     <!-- Barre de recherche avec filtres avancés -->
-                    {% include 'partials/_search_bar.html.twig' %}
+                    {% include 'partials/_search_bar.html.twig' with {'form': search_form} %}
 
                     <div class="mt-4">
                         {% if articles|length > 0 %}
@@ -70,6 +70,22 @@
                                                 <div class="d-flex justify-content-between align-items-center">
                                                     <small>Par {{ article.author.username }}</small>
                                                     <small>{{ article.createdAt|date('d/m/Y') }}</small>
+                                                </div>
+                                                <div class="mt-2 d-flex justify-content-between">
+                                                    <a href="{{ path('app_article_show', {'id': article.id}) }}" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-eye me-1"></i> Lire
+                                                    </a>
+                                                    {% if app.user %}
+                                                        {% if app.user.isFavorite(article) %}
+                                                            <a href="{{ path('app_favorite_toggle', {'id': article.id}) }}" class="btn btn-sm btn-danger favorite-btn">
+                                                                <i class="fas fa-heart me-1"></i>
+                                                            </a>
+                                                        {% else %}
+                                                            <a href="{{ path('app_favorite_toggle', {'id': article.id}) }}" class="btn btn-sm btn-outline-danger favorite-btn">
+                                                                <i class="far fa-heart me-1"></i>
+                                                            </a>
+                                                        {% endif %}
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                         </div>
@@ -144,6 +160,15 @@
             margin-bottom: 5px;
             display: block;
             font-size: 14px;
+        }
+        
+        /* Animation pour le bouton favori */
+        .favorite-btn {
+            transition: all 0.3s ease;
+        }
+        
+        .favorite-btn:hover {
+            transform: scale(1.1);
         }
     </style>
 {% endblock %}

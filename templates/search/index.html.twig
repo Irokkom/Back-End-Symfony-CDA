@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Recherche{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-search me-2"></i> Recherche
+            {% if search_query %}
+                <small class="text-muted">Résultats pour "{{ search_query }}" ({{ total_results }} résultats)</small>
+            {% endif %}
+        </h1>
+        
+        {% if search_query %}
+            <p class="lead"></p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-12">
+        {% include 'partials/_search_bar.html.twig' with {'form': form} %}
+    </div>
+</div>
+
+<div class="row">
+    {% if results is empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i> 
+                {% if search_query %}
+                    Aucun résultat ne correspond à votre recherche.
+                {% else %}
+                    Utilisez le formulaire ci-dessus pour effectuer une recherche.
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        {% for article in results %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm article-card">
+                    {% if article.medias is not empty and article.medias.first is not null %}
+                        <img src="{{ article.medias.first.url }}" class="card-img-top article-img" alt="{{ article.title }}">
+                    {% else %}
+                        <div class="card-img-top article-img-placeholder d-flex align-items-center justify-content-center bg-light">
+                            <i class="fas fa-newspaper fa-3x text-secondary"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="card-body">
+                        <h5 class="card-title">{{ article.title }}</h5>
+                        
+                        <div class="d-flex mb-2">
+                            {% for category in article.categories %}
+                                <a href="{{ path('app_category_show', {'id': category.id}) }}" class="badge bg-primary me-1">
+                                    {{ category.name }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                        
+                        <p class="card-text">{{ article.content|striptags|slice(0, 150) }}...</p>
+                    </div>
+                    
+                    <div class="card-footer bg-transparent">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="small text-muted">
+                                <i class="far fa-calendar-alt me-1"></i> {{ article.createdAt|date('d/m/Y') }}
+                            </div>
+                            <a href="{{ path('app_article_show', {'id': article.id}) }}" class="btn btn-sm btn-outline-primary">
+                                Lire <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Réinitialiser le formulaire
+            document.getElementById('resetForm').addEventListener('click', function() {
+                document.querySelectorAll('input[type="text"], input[type="search"], input[type="date"], select').forEach(function(input) {
+                    input.value = '';
+                });
+                // Soumettre le formulaire vide
+                this.closest('form').submit();
+            });
+        });
+    </script>
+{% endblock %}

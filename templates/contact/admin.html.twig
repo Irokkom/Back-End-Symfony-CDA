@@ -1,0 +1,149 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Administration des messages de contact{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="section-title position-relative">Administration des messages de contact</h1>
+            <p class="text-muted">Gérez les messages reçus via le formulaire de contact.</p>
+        </div>
+    </div>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+        </div>
+    {% endfor %}
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            {% if contacts|length > 0 %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col" class="ps-4">Date</th>
+                                <th scope="col">Nom</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Sujet</th>
+                                <th scope="col">Statut</th>
+                                <th scope="col" class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for contact in contacts %}
+                                <tr class="{{ contact.isRead ? '' : 'table-primary' }}">
+                                    <td class="ps-4">{{ contact.createdAt|date('d/m/Y H:i') }}</td>
+                                    <td>{{ contact.name }}</td>
+                                    <td>
+                                        <a href="mailto:{{ contact.email }}" class="text-decoration-none">
+                                            {{ contact.email }}
+                                        </a>
+                                    </td>
+                                    <td>{{ contact.subject }}</td>
+                                    <td>
+                                        {% if contact.isRead %}
+                                            <span class="badge bg-success">Lu</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">Non lu</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <button type="button" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#viewModal{{ contact.id }}">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        
+                                        {% if not contact.isRead %}
+                                            <a href="{{ path('admin_contact_mark_read', {'id': contact.id}) }}" class="btn btn-sm btn-outline-success me-1">
+                                                <i class="fas fa-check"></i>
+                                            </a>
+                                        {% endif %}
+                                        
+                                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ contact.id }}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Modal Visualisation -->
+                                <div class="modal fade" id="viewModal{{ contact.id }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Message de {{ contact.name }}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <strong>Date :</strong> {{ contact.createdAt|date('d/m/Y H:i') }}
+                                                </div>
+                                                <div class="mb-3">
+                                                    <strong>Email :</strong> 
+                                                    <a href="mailto:{{ contact.email }}">{{ contact.email }}</a>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <strong>Sujet :</strong> {{ contact.subject }}
+                                                </div>
+                                                <div class="mb-3">
+                                                    <strong>Message :</strong>
+                                                    <div class="p-3 bg-light rounded mt-2">
+                                                        {{ contact.message|nl2br }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                {% if not contact.isRead %}
+                                                    <a href="{{ path('admin_contact_mark_read', {'id': contact.id}) }}" class="btn btn-success">
+                                                        <i class="fas fa-check me-1"></i> Marquer comme lu
+                                                    </a>
+                                                {% endif %}
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Modal Suppression -->
+                                <div class="modal fade" id="deleteModal{{ contact.id }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Confirmation de suppression</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Êtes-vous sûr de vouloir supprimer le message de <strong>{{ contact.name }}</strong> avec le sujet "<strong>{{ contact.subject }}</strong>" ?</p>
+                                                <p class="text-danger"><strong>Attention :</strong> Cette action est irréversible.</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <form method="post" action="{{ path('admin_contact_delete', {'id': contact.id}) }}">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ contact.id) }}">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                                    <button type="submit" class="btn btn-danger">
+                                                        <i class="fas fa-trash me-1"></i> Supprimer
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="p-4 text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-inbox fa-3x text-muted"></i>
+                    </div>
+                    <h4>Aucun message de contact</h4>
+                    <p class="text-muted">Il n'y a actuellement aucun message dans la boîte de réception.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

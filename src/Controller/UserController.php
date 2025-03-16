@@ -27,16 +27,19 @@ class UserController extends AbstractController
     #[IsGranted('ROLE_USER')]
     public function profile(): Response
     {
+        /** @var User $user */
         $user = $this->getUser();
         
         // Récupérer les statistiques de l'utilisateur
         $articlesCount = $this->articleRepository->count(['author' => $user]);
         $commentsCount = $this->commentRepository->count(['author' => $user]);
+        $favoritesCount = $user->getFavoriteArticles()->count();
         
         return $this->render('user/profile.html.twig', [
             'user' => $user,
             'articlesCount' => $articlesCount,
-            'commentsCount' => $commentsCount
+            'commentsCount' => $commentsCount,
+            'favoritesCount' => $favoritesCount
         ]);
     }
     
@@ -44,6 +47,7 @@ class UserController extends AbstractController
     #[IsGranted('ROLE_USER')]
     public function editProfile(Request $request): Response
     {
+        /** @var User $user */
         $user = $this->getUser();
         $form = $this->createForm(ProfileType::class, $user);
         $form->handleRequest($request);

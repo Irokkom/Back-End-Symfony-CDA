@@ -6,140 +6,119 @@ use App\Controller\HomeController;
 use App\Repository\ArticleRepository;
 use App\Repository\CategoryRepository;
 use App\Service\MongoDBService;
-use App\Service\SearchService;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class HomeControllerTest extends TestCase
 {
-    private $homeController;
-    private $articleRepository;
-    private $categoryRepository;
-    private $searchService;
-    private $mongoDBService;
-
-    protected function setUp(): void
-    {
-        // Création des mocks pour les dépendances
-        $this->articleRepository = $this->createMock(ArticleRepository::class);
-        $this->categoryRepository = $this->createMock(CategoryRepository::class);
-        $this->searchService = $this->createMock(SearchService::class);
-        $this->mongoDBService = $this->createMock(MongoDBService::class);
-        
-        // Création du HomeController avec les mocks
-        $this->homeController = $this->getMockBuilder(HomeController::class)
-            ->setConstructorArgs([
-                $this->articleRepository,
-                $this->categoryRepository,
-                $this->searchService,
-                $this->mongoDBService
-            ])
-            ->onlyMethods(['render'])
-            ->getMock();
-    }
-
     public function testIndex(): void
     {
-        // Création d'un mock pour FormInterface et FormView
-        $formView = $this->createMock(FormView::class);
-        $form = $this->createMock(FormInterface::class);
-        $form->method('createView')->willReturn($formView);
+        // Création des mocks pour les dépendances
+        $articleRepository = $this->createMock(ArticleRepository::class);
+        $categoryRepository = $this->createMock(CategoryRepository::class);
+        $mongoDBService = $this->createMock(MongoDBService::class);
         
-        // Configuration des attentes pour les mocks
-        $this->mongoDBService
-            ->expects($this->once())
-            ->method('insertVisit')
-            ->with('home_page');
-            
-        $this->searchService
-            ->expects($this->once())
-            ->method('handleSearchForm')
-            ->willReturn(['form' => $form, 'results' => []]);
-            
-        $this->articleRepository
-            ->expects($this->once())
+        // Configuration des mocks
+        $articleRepository->expects($this->once())
             ->method('findLatest')
             ->with(4)
             ->willReturn([]);
+        
+        $articleRepository->expects($this->once())
+            ->method('findLatestExcept')
+            ->willReturn([]);
             
-        $this->categoryRepository
-            ->expects($this->once())
+        $categoryRepository->expects($this->once())
             ->method('findAllWithArticles')
             ->willReturn([]);
             
-        // Configuration du mock pour la méthode render
-        $this->homeController
-            ->expects($this->once())
+        $mongoDBService->expects($this->once())
+            ->method('insertVisit')
+            ->with('home_page');
+
+        // Création du mock de HomeController
+        $controller = $this->getMockBuilder(HomeController::class)
+            ->setConstructorArgs([$articleRepository, $categoryRepository, $mongoDBService])
+            ->onlyMethods(['render', 'createForm', 'generateUrl'])
+            ->getMock();
+        
+        // Mock du formulaire
+        $formView = $this->createMock(FormView::class);
+        $form = $this->createMock(FormInterface::class);
+        $form->expects($this->once())
+            ->method('createView')
+            ->willReturn($formView);
+        
+        // Configuration du mock du controller
+        $controller->expects($this->once())
+            ->method('createForm')
+            ->willReturn($form);
+            
+        $controller->expects($this->once())
+            ->method('generateUrl')
+            ->with('app_search')
+            ->willReturn('/recherche');
+            
+        $controller->expects($this->once())
             ->method('render')
             ->with(
-                $this->equalTo('home/index.html.twig'),
-                $this->anything()
+                'home/index.html.twig',
+                $this->callback(function ($params) use ($formView) {
+                    return isset($params['featured_articles']) && 
+                           isset($params['latest_articles']) &&
+                           isset($params['categories']) &&
+                           isset($params['search_form']) &&
+                           $params['search_form'] === $formView;
+                })
             )
             ->willReturn(new Response());
-            
-        // Création d'une requête simulée
+        
+        // Création d'une requête sans paramètre de recherche
         $request = new Request();
         
-        // Appel de la méthode index du HomeController
-        $response = $this->homeController->index($request);
+        // Invoque la méthode index via reflection car le mock ne peut pas l'exposer directement
+        $method = new \ReflectionMethod(HomeController::class, 'index');
+        $method->setAccessible(true);
+        $response = $method->invoke($controller, $request);
         
         // Vérification que la réponse est une instance de Response
         $this->assertInstanceOf(Response::class, $response);
     }
-    
+
     public function testSearch(): void
     {
-        // Ce test est similaire à testIndex mais se concentre sur la fonctionnalité de recherche
-        // Pour simplifier, nous allons juste vérifier que le service de recherche est appelé correctement
+        // Création des mocks pour les dépendances
+        $articleRepository = $this->createMock(ArticleRepository::class);
+        $categoryRepository = $this->createMock(CategoryRepository::class);
+        $mongoDBService = $this->createMock(MongoDBService::class);
         
-        // Création d'un mock pour FormInterface et FormView
-        $formView = $this->createMock(FormView::class);
-        $form = $this->createMock(FormInterface::class);
-        $form->method('createView')->willReturn($formView);
+        // Création du mock de HomeController avec méthode redirectToRoute
+        $controller = $this->getMockBuilder(HomeController::class)
+            ->setConstructorArgs([$articleRepository, $categoryRepository, $mongoDBService])
+            ->onlyMethods(['redirectToRoute'])
+            ->getMock();
         
-        // Configuration des attentes pour les mocks
-        $this->mongoDBService
-            ->expects($this->once())
-            ->method('insertVisit')
-            ->with('home_page');
-            
-        // Simuler une recherche avec des résultats
-        $searchResults = ['article1', 'article2'];
-        $this->searchService
-            ->expects($this->once())
-            ->method('handleSearchForm')
-            ->willReturn(['form' => $form, 'results' => $searchResults]);
-            
-        // Dans ce cas, findLatest ne devrait pas être appelé car nous avons des résultats de recherche
-        $this->articleRepository
-            ->expects($this->never())
-            ->method('findLatest');
-            
-        $this->categoryRepository
-            ->expects($this->once())
-            ->method('findAllWithArticles')
-            ->willReturn([]);
-            
-        // Configuration du mock pour la méthode render
-        $this->homeController
-            ->expects($this->once())
-            ->method('render')
+        // Configuration du mock
+        $controller->expects($this->once())
+            ->method('redirectToRoute')
             ->with(
-                $this->equalTo('home/index.html.twig'),
-                $this->callback(function($parameters) use ($searchResults) {
-                    return $parameters['search_results'] === $searchResults;
-                })
+                'app_search',
+                ['q' => 'test']
             )
-            ->willReturn(new Response());
-            
-        // Création d'une requête simulée avec un paramètre de recherche
+            ->willReturn(new RedirectResponse('/search?q=test'));
+        
+        // Création d'une requête avec paramètre de recherche
         $request = new Request(['q' => 'test']);
         
-        // Appel de la méthode index du HomeController
-        $response = $this->homeController->index($request);
+        // Invoque la méthode index via reflection car le mock ne peut pas l'exposer directement
+        $method = new \ReflectionMethod(HomeController::class, 'index');
+        $method->setAccessible(true);
+        $response = $method->invoke($controller, $request);
         
         // Vérification que la réponse est une instance de Response
         $this->assertInstanceOf(Response::class, $response);

@@ -1,8 +1,8 @@
 <div class="col">
-    <div class="card h-100 shadow-sm hover-card">
+    <div class="card h-100 shadow-sm hover-card mb-3 mb-lg-0">
         <div class="placeholder-img">
             {% if article.imageFilename is defined and article.imageFilename %}
-                <img src="{{ asset('uploads/articles/' ~ article.imageFilename) }}" class="img-fluid" alt="{{ article.title }}">
+                <img src="{{ asset('uploads/articles/' ~ article.imageFilename) }}" class="img-fluid w-100" alt="{{ article.title }}">
             {% endif %}
         </div>
         <div class="card-body d-flex flex-column">
@@ -18,8 +18,8 @@
             </h5>
             <p class="card-text text-secondary mb-3">{{ article.content|striptags|slice(0, 100) }}...</p>
             
-            <div class="mt-auto d-flex justify-content-between align-items-center">
-                <div class="article-author">
+            <div class="mt-auto d-flex justify-content-between align-items-center flex-wrap">
+                <div class="article-author mb-2 mb-md-0">
                     <i class="fas fa-user-circle"></i> {{ article.author.username }}
                 </div>
                 <div class="article-meta">

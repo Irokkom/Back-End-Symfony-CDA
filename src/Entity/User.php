@@ -66,10 +66,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $createdAt = null;
 
+    #[ORM\ManyToMany(targetEntity: Article::class)]
+    #[ORM\JoinTable(name: 'user_favorite_articles')]
+    private Collection $favoriteArticles;
+
     public function __construct()
     {
         $this->articles = new ArrayCollection();
         $this->comments = new ArrayCollection();
+        $this->favoriteArticles = new ArrayCollection();
         $this->createdAt = new \DateTime();
     }
 
@@ -197,6 +202,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->createdAt = $createdAt;
         return $this;
+    }
+
+    /**
+     * @return Collection<int, Article>
+     */
+    public function getFavoriteArticles(): Collection
+    {
+        return $this->favoriteArticles;
+    }
+
+    public function addFavoriteArticle(Article $article): static
+    {
+        if (!$this->favoriteArticles->contains($article)) {
+            $this->favoriteArticles->add($article);
+        }
+
+        return $this;
+    }
+
+    public function removeFavoriteArticle(Article $article): static
+    {
+        $this->favoriteArticles->removeElement($article);
+
+        return $this;
+    }
+
+    public function isFavorite(Article $article): bool
+    {
+        return $this->favoriteArticles->contains($article);
     }
 
     public function isAdmin(): bool

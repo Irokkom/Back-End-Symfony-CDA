@@ -39,6 +39,7 @@
                     {% endfor %}
                 {% else %}
                     <div class="carousel-item active">
+                        {% if featured_article is not null %}
                         <div class="featured-article bg-primary text-white text-center py-5" {% if featured_article.medias|length > 0 %}style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), url('{{ asset(featured_article.medias|first.url) }}') no-repeat center center; background-size: cover;"{% endif %}>
                             <div class="container py-5">
                                 <h1 class="display-3 fw-bold mb-3">{{ featured_article.title }}</h1>
@@ -53,6 +54,14 @@
                                 </a>
                             </div>
                         </div>
+                        {% else %}
+                        <div class="featured-article bg-primary text-white text-center py-5">
+                            <div class="container py-5">
+                                <h1 class="display-3 fw-bold mb-3">Aucun article à afficher</h1>
+                                <p class="lead mb-4 col-md-8 mx-auto">Consultez notre site plus tard pour découvrir nos derniers articles.</p>
+                            </div>
+                        </div>
+                        {% endif %}
                     </div>
                 {% endif %}
             </div>
@@ -87,7 +96,7 @@
     {% endif %}
 
     <!-- Barre de recherche améliorée - Déplacée après la section Hero -->
-    {% include 'partials/_search_bar.html.twig' %}
+    {% include 'partials/_search_bar.html.twig' with {'form': search_form} %}
 
     <div class="container">
         <div class="row">

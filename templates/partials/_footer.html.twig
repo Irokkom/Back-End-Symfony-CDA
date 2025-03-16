@@ -1,50 +1,85 @@
 <footer class="footer py-4 mt-5">
     <div class="container">
-        <div class="row">
+        <div class="row gy-4">
             <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
-                <h5>À propos</h5>
-                <p>Notre plateforme vous offre un accès à des articles informatifs et éducatifs dans divers domaines.</p>
+                <h5 class="mb-3">À propos</h5>
+                <p class="mb-2">Notre plateforme vous offre un accès à des articles informatifs et éducatifs dans divers domaines.</p>
                 <p>Restez informé sur les dernières actualités et partagez facilement vos connaissances avec notre communauté.</p>
             </div>
-            <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
-                <h5>Navigation</h5>
-                <ul>
-                    <li><a href="{{ path('app_home') }}">Accueil</a></li>
-                    <li><a href="{{ path('app_article_index') }}">Articles</a></li>
-                    <li><a href="{{ path('app_category_index') }}">Catégories</a></li>
+            <div class="col-lg-2 col-md-6 col-6 mb-4 mb-lg-0">
+                <h5 class="mb-3">Navigation</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="{{ path('app_home') }}" class="text-decoration-none"><i class="fas fa-angle-right me-1"></i> Accueil</a></li>
+                    <li class="mb-2"><a href="{{ path('app_article_index') }}" class="text-decoration-none"><i class="fas fa-angle-right me-1"></i> Articles</a></li>
+                    <li class="mb-2"><a href="{{ path('app_category_index') }}" class="text-decoration-none"><i class="fas fa-angle-right me-1"></i> Catégories</a></li>
                     {% if not app.user %}
-                        <li><a href="{{ path('app_login') }}">Connexion</a></li>
-                        <li><a href="{{ path('app_register') }}">Inscription</a></li>
+                        <li class="mb-2"><a href="{{ path('app_login') }}" class="text-decoration-none"><i class="fas fa-angle-right me-1"></i> Connexion</a></li>
+                        <li><a href="{{ path('app_register') }}" class="text-decoration-none"><i class="fas fa-angle-right me-1"></i> Inscription</a></li>
                     {% endif %}
                 </ul>
             </div>
-            <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
-                <h5>Légal</h5>
-                <ul>
-                    <li><a href="#">Mentions légales</a></li>
-                    <li><a href="#">Conditions d'utilisation</a></li>
-                    <li><a href="#">Politique de confidentialité</a></li>
+            <div class="col-lg-2 col-md-6 col-6 mb-4 mb-lg-0">
+                <h5 class="mb-3">Légal</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="{{ path('app_legal_mentions') }}" class="text-decoration-none"><i class="fas fa-angle-right me-1"></i> Mentions légales</a></li>
+                    <li class="mb-2"><a href="{{ path('app_legal_conditions') }}" class="text-decoration-none"><i class="fas fa-angle-right me-1"></i> Conditions d'utilisation</a></li>
+                    <li><a href="{{ path('app_legal_privacy') }}" class="text-decoration-none"><i class="fas fa-angle-right me-1"></i> Politique de confidentialité</a></li>
                 </ul>
             </div>
             <div class="col-lg-4 col-md-6">
-                <h5>Restons connectés</h5>
-                <p>Suivez-nous sur les réseaux sociaux pour ne rien manquer de nos actualités.</p>
-                <div class="d-flex">
-                    <a href="#" class="me-3"><i class="fab fa-facebook-f fa-lg"></i></a>
-                    <a href="#" class="me-3"><i class="fab fa-twitter fa-lg"></i></a>
-                    <a href="#" class="me-3"><i class="fab fa-instagram fa-lg"></i></a>
-                    <a href="#" class="me-3"><i class="fab fa-linkedin-in fa-lg"></i></a>
+                <h5 class="mb-3">Restons connectés</h5>
+                <p class="mb-3">Suivez-nous sur les réseaux sociaux pour ne rien manquer de nos actualités.</p>
+                <div class="d-flex social-icons">
+                    <a href="#" class="me-3 social-icon"><i class="fab fa-facebook-f fa-lg"></i></a>
+                    <a href="#" class="me-3 social-icon"><i class="fab fa-twitter fa-lg"></i></a>
+                    <a href="#" class="me-3 social-icon"><i class="fab fa-instagram fa-lg"></i></a>
+                    <a href="#" class="me-3 social-icon"><i class="fab fa-linkedin-in fa-lg"></i></a>
                 </div>
             </div>
         </div>
         <hr class="my-4">
-        <div class="row">
-            <div class="col-md-6">
-                <p>© {{ "now"|date("Y") }} CoolModding. Tous droits réservés.</p>
+        <div class="row gy-3">
+            <div class="col-md-6 text-center text-md-start">
+                <p class="mb-0"> {{ "now"|date("Y") }} CoolModding. Tous droits réservés.</p>
             </div>
-            <div class="col-md-6 text-md-end">
-                <a href="#">Haut de page</a>
+            <div class="col-md-6 text-center text-md-end">
+                <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="btn btn-link text-decoration-none p-0">
+                    <i class="fas fa-arrow-up me-1"></i> Haut de page
+                </button>
             </div>
         </div>
     </div>
 </footer>
+
+{# Script pour le footer sticky #}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Fonction pour ajuster la position du footer
+    function adjustFooter() {
+        var body = document.body;
+        var html = document.documentElement;
+        var footer = document.querySelector('.footer');
+        
+        var windowHeight = window.innerHeight;
+        var bodyHeight = Math.max(
+            body.scrollHeight, body.offsetHeight,
+            html.clientHeight, html.scrollHeight, html.offsetHeight
+        );
+        
+        // Si le contenu est plus petit que la fenêtre, faire en sorte que le footer soit en bas
+        if (bodyHeight < windowHeight) {
+            footer.style.position = 'absolute';
+            footer.style.bottom = '0';
+            footer.style.width = '100%';
+        } else {
+            footer.style.position = 'relative';
+        }
+    }
+    
+    // Ajuster au chargement de la page
+    adjustFooter();
+    
+    // Ajuster au redimensionnement de la fenêtre
+    window.addEventListener('resize', adjustFooter);
+});
+</script>

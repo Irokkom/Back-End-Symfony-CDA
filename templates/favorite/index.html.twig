@@ -1,0 +1,138 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes articles favoris{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <!-- Statistiques -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                <i class="fas fa-heart me-2"></i> Mes articles favoris
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row text-center">
+                <div class="col">
+                    <h2 class="text-primary">{{ favorite_articles|length }}</h2>
+                    <p class="text-muted">Articles favoris</p>
+                </div>
+                {% if favorite_articles|length > 0 %}
+                    <div class="col">
+                        <h2 class="text-primary">{{ favorite_articles[0].createdAt|date('d/m/Y') }}</h2>
+                        <p class="text-muted">Dernier ajout</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+        </div>
+    {% endfor %}
+
+    {% if favorite_articles|length > 0 %}
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i> Liste de mes articles favoris
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    {% for article in favorite_articles %}
+                        <div class="col">
+                            <div class="card h-100 article-card">
+                                {% if article.medias|length > 0 %}
+                                    <img src="{{ article.medias.first.url }}" 
+                                        class="card-img-top" 
+                                        alt="{{ article.title }}"
+                                        style="height: 180px; object-fit: cover;">
+                                {% else %}
+                                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
+                                        <i class="fas fa-image fa-3x text-muted"></i>
+                                    </div>
+                                {% endif %}
+                                
+                                <div class="card-body">
+                                    <h5 class="card-title text-truncate">{{ article.title }}</h5>
+                                    <div class="mb-2">
+                                        {% for category in article.categories %}
+                                            <span class="badge bg-secondary me-1">{{ category.name }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    <p class="card-text">{{ article.content|striptags|slice(0, 80) }}{% if article.content|length > 80 %}...{% endif %}</p>
+                                </div>
+                                
+                                <div class="card-footer d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar-alt me-1"></i> {{ article.createdAt|date('d/m/Y') }}
+                                    </small>
+                                    <div>
+                                        <a href="{{ path('app_article_show', {'id': article.id}) }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye me-1"></i> Lire
+                                        </a>
+                                        <a href="{{ path('app_favorite_remove', {'id': article.id}) }}" class="btn btn-sm btn-danger favorite-btn">
+                                            <i class="fas fa-times me-1"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i> Liste de mes articles favoris
+                </h5>
+            </div>
+            <div class="card-body text-center py-5">
+                <i class="fas fa-heart fa-5x text-muted mb-3"></i>
+                <h3>Aucun article favori</h3>
+                <p class="text-muted">Vous n'avez pas encore ajouté d'articles à vos favoris.</p>
+                <a href="{{ path('app_article_index') }}" class="btn btn-primary mt-3">
+                    <i class="fas fa-newspaper me-2"></i>Découvrir les articles
+                </a>
+            </div>
+        </div>
+    {% endif %}
+    
+    <div class="mt-4">
+        <a href="{{ path('app_profile') }}" class="btn btn-info text-white me-2">
+            <i class="fas fa-user-circle me-1"></i> Retour au profil
+        </a>
+        <a href="{{ path('app_home') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Retour à l'accueil
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .article-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .article-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .favorite-btn {
+        transition: all 0.3s ease;
+    }
+        
+    .favorite-btn:hover {
+        transform: scale(1.1);
+    }
+</style>
+{% endblock %}

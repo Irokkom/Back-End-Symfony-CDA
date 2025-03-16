@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mentions légales{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h1 class="mb-0"><i class="fas fa-gavel me-2"></i>Mentions légales</h1>
+        </div>
+        <div class="card-body">
+            <h2 class="text-primary mb-3">Éditeur du site</h2>
+            <div class="mb-4">
+                <p><strong>CodeModding</strong></p>
+                <p>Siège social : 123 Avenue de l'Innovation, 75000 Paris, France</p>
+                <p>SIRET : 123 456 789 00012</p>
+                <p>Email : contact@codemodding.fr</p>
+                <p>Téléphone : 01 23 45 67 89</p>
+            </div>
+
+            <h2 class="text-primary mb-3">Directeur de la publication</h2>
+            <div class="mb-4">
+                <p>Jean Dupont, en qualité de dirigeant de CodeModding</p>
+            </div>
+
+            <h2 class="text-primary mb-3">Hébergement</h2>
+            <div class="mb-4">
+                <p><strong>OVH Cloud</strong></p>
+                <p>2 rue Kellermann, 59100 Roubaix, France</p>
+                <p>SIREN : 424 761 419 00045</p>
+                <p>Téléphone : 09 72 10 10 07</p>
+            </div>
+
+            <h2 class="text-primary mb-3">Propriété intellectuelle</h2>
+            <div class="mb-4">
+                <p>L'ensemble du contenu présent sur ce site (textes, images, vidéos, etc.) est la propriété exclusive de CodeModding ou de ses partenaires. Toute reproduction, représentation, modification, publication ou adaptation de tout ou partie des éléments du site, quel que soit le moyen ou le procédé utilisé, est interdite, sauf autorisation écrite préalable.</p>
+                <p>Toute exploitation non autorisée du site ou de son contenu sera considérée comme constitutive d'une contrefaçon et poursuivie conformément aux dispositions des articles L.335-2 et suivants du Code de Propriété Intellectuelle.</p>
+            </div>
+
+            <h2 class="text-primary mb-3">Limitation de responsabilité</h2>
+            <div class="mb-4">
+                <p>CodeModding ne pourra être tenue responsable des dommages directs et indirects causés au matériel de l'utilisateur, lors de l'accès au site, et résultant soit de l'utilisation d'un matériel ne répondant pas aux spécifications techniques requises, soit de l'apparition d'un bug ou d'une incompatibilité.</p>
+                <p>CodeModding ne pourra également être tenue responsable des dommages indirects consécutifs à l'utilisation du site.</p>
+            </div>
+
+            <h2 class="text-primary mb-3">Loi applicable et juridiction</h2>
+            <div class="mb-4">
+                <p>Les présentes mentions légales sont régies par la loi française. En cas de litige, les tribunaux français seront seuls compétents.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="{{ path('app_home') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Retour à l'accueil
+        </a>
+    </div>
+</div>
+{% endblock %}

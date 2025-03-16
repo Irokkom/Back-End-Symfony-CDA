@@ -19,6 +19,19 @@
                         <span class="badge bg-info me-1">{{ category.name }}</span>
                     {% endfor %}
                 </div>
+                {% if app.user %}
+                    <div class="favorite-actions mb-3">
+                        {% if app.user.isFavorite(article) %}
+                            <a href="{{ path('app_favorite_remove', {'id': article.id}) }}" class="btn btn-sm btn-danger favorite-btn">
+                                <i class="fas fa-heart-broken me-1"></i> Retirer des favoris
+                            </a>
+                        {% else %}
+                            <a href="{{ path('app_favorite_add', {'id': article.id}) }}" class="btn btn-sm btn-outline-danger favorite-btn">
+                                <i class="fas fa-heart me-1"></i> Ajouter aux favoris
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
             </header>
 
             <div class="article-body mb-4">

@@ -24,17 +24,21 @@
                         <i class="fas fa-tags me-1"></i> Catégories
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ route starts with 'app_contact' ? 'active' }}" 
+                       href="{{ path('app_contact') }}">
+                        <i class="fas fa-envelope me-1"></i> Contact
+                    </a>
+                </li>
 
                 {% if is_granted('ROLE_ADMIN') %}
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle {{ route starts with 'admin_' ? 'active' }}" 
-                           href="#" 
+                        <button class="nav-link dropdown-toggle {{ route starts with 'admin_' ? 'active' }}" 
                            id="adminDropdown" 
-                           role="button" 
                            data-bs-toggle="dropdown" 
                            aria-expanded="false">
                             <i class="fas fa-cog me-1"></i> Administration
-                        </a>
+                        </button>
                         <ul class="dropdown-menu" aria-labelledby="adminDropdown">
                             <li>
                                 <a class="dropdown-item {{ route starts with 'admin_articles' ? 'active' }}" 
@@ -54,15 +58,22 @@
                                     <i class="fas fa-users me-1"></i> Gestion des utilisateurs
                                 </a>
                             </li>
+                            <li>
+                                <a class="dropdown-item {{ route starts with 'admin_contacts' ? 'active' }}" 
+                                   href="{{ path('admin_contacts') }}">
+                                    <i class="fas fa-envelope me-1"></i> Messages de contact
+                                    <span class="badge bg-danger rounded-pill ms-1">Nouveau</span>
+                                </a>
+                            </li>
                         </ul>
                     </li>
                 {% endif %}
             </ul>
 
             <!-- Barre de recherche -->
-            <form class="d-flex mx-3" action="{{ path('app_article_index') }}" method="GET">
+            <form class="d-flex mx-3" action="{{ path('app_search') }}" method="GET">
                 <div class="input-group">
-                    <input type="search" name="query" class="form-control form-control-sm" placeholder="Rechercher..." aria-label="Rechercher">
+                    <input type="search" name="q" class="form-control form-control-sm" placeholder="Rechercher..." aria-label="Rechercher">
                     <button class="btn btn-search" type="submit">
                         <i class="fas fa-search search-icon-highlight"></i>
                     </button>
@@ -72,14 +83,24 @@
             <ul class="navbar-nav">
                 {% if app.user %}
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                        <button class="nav-link dropdown-toggle" id="userDropdown"
                            data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-user me-1"></i> {{ app.user.username }}
-                        </a>
+                        </button>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li>
                                 <a class="dropdown-item" href="{{ path('app_profile') }}">
                                     <i class="fas fa-user-circle me-1"></i> Mon profil
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {{ route starts with 'app_favorites' ? 'active' }}" href="{{ path('app_favorites') }}">
+                                    <i class="fas fa-heart me-1"></i> Mes favoris
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {{ route starts with 'app_user_comments' ? 'active' }}" href="{{ path('app_user_comments') }}">
+                                    <i class="fas fa-comments me-1"></i> Mes commentaires
                                 </a>
                             </li>
                             {% if is_granted('ROLE_ADMIN') %}

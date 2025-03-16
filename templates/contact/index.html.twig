@@ -1,0 +1,143 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contactez-nous{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <h1 class="section-title position-relative">Contactez-nous</h1>
+                        <p class="text-muted">Vous avez une question ou une suggestion ? N'hésitez pas à nous contacter !</p>
+                    </div>
+
+                    {% for message in app.flashes('success') %}
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                        </div>
+                    {% endfor %}
+
+                    <div class="contact-form">
+                        {{ form_start(contact_form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form_label(contact_form.name, 'Votre nom', {'label_attr': {'class': 'form-label'}}) }}
+                                    {{ form_widget(contact_form.name, {'attr': {'class': 'form-control', 'placeholder': 'Entrez votre nom complet'}}) }}
+                                    {{ form_errors(contact_form.name) }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form_label(contact_form.email, 'Votre email', {'label_attr': {'class': 'form-label'}}) }}
+                                    {{ form_widget(contact_form.email, {'attr': {'class': 'form-control', 'placeholder': 'exemple@domain.com'}}) }}
+                                    {{ form_errors(contact_form.email) }}
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                {{ form_label(contact_form.subject, 'Sujet', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(contact_form.subject, {'attr': {'class': 'form-control', 'placeholder': 'Sujet de votre message'}}) }}
+                                {{ form_errors(contact_form.subject) }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form_label(contact_form.message, 'Votre message', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(contact_form.message, {'attr': {'class': 'form-control', 'style': 'height: 150px', 'placeholder': 'Écrivez votre message ici...'}}) }}
+                                {{ form_errors(contact_form.message) }}
+                            </div>
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane me-2"></i>Envoyer
+                                </button>
+                            </div>
+                        {{ form_end(contact_form) }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-5 g-4">
+                <div class="col-md-4">
+                    <div class="contact-info-item text-center">
+                        <div class="icon-box mb-3">
+                            <i class="fas fa-map-marker-alt fa-2x text-primary"></i>
+                        </div>
+                        <h5>Notre adresse</h5>
+                        <p class="mb-0">123 Rue de l'Innovation, 75000 Paris</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="contact-info-item text-center">
+                        <div class="icon-box mb-3">
+                            <i class="fas fa-phone-alt fa-2x text-primary"></i>
+                        </div>
+                        <h5>Téléphone</h5>
+                        <p class="mb-0">+33 (0)1 23 45 67 89</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="contact-info-item text-center">
+                        <div class="icon-box mb-3">
+                            <i class="fas fa-envelope fa-2x text-primary"></i>
+                        </div>
+                        <h5>Email</h5>
+                        <p class="mb-0">contact@coolmodding.fr</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="map-container">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2624.9916256937604!2d2.2922926156749066!3d48.858370079287475!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66e2964e34e2d%3A0x8ddca9ee380ef7e0!2sTour%20Eiffel!5e0!3m2!1sfr!2sfr!4v1647859015612!5m2!1sfr!2sfr" 
+                        width="100%" 
+                        height="400" 
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy"
+                        title="Carte Google Maps montrant notre emplacement à Paris"
+                        class="rounded shadow-sm"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .contact-info-item {
+        padding: 1.5rem;
+        background-color: #fff;
+        border-radius: 0.5rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+    
+    .contact-info-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .icon-box {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 70px;
+        height: 70px;
+        background-color: rgba(66, 114, 215, 0.1);
+        border-radius: 50%;
+    }
+    
+    /* Style pour les erreurs de validation */
+    .form-control.is-invalid {
+        border-color: #dc3545;
+        background-image: none;
+    }
+    
+    .invalid-feedback {
+        display: block;
+    }
+</style>
+{% endblock %}
