@@ -1,12 +1,22 @@
+{# 
+  Template d'affichage détaillé d'un article
+  Ce template étend base.html.twig et ajoute le contenu spécifique à l'affichage d'un article
+#}
 {% extends 'base.html.twig' %}
 
+{# Titre de la page - Affiche le titre de l'article dans l'onglet du navigateur #}
 {% block title %}{{ article.title }}{% endblock %}
 
 {% block body %}
     <div class="container mt-4">
+        {# Article principal - Structure complète de l'article #}
         <article class="article-content">
+            {# En-tête de l'article - Titre, métadonnées et actions #}
             <header class="mb-4">
+                {# Titre de l'article #}
                 <h1>{{ article.title }}</h1>
+                
+                {# Métadonnées: auteur et date de création #}
                 <div class="article-meta text-muted mb-3">
                     <small>
                         <i class="fas fa-user me-1"></i> Par {{ article.author.username }}
@@ -14,13 +24,18 @@
                         <i class="fas fa-calendar me-1"></i> {{ article.createdAt|date('d/m/Y H:i') }}
                     </small>
                 </div>
+                
+                {# Catégories associées à l'article #}
                 <div class="article-categories mb-3">
                     {% for category in article.categories %}
                         <span class="badge bg-info me-1">{{ category.name }}</span>
                     {% endfor %}
                 </div>
+                
+                {# Bouton "Favoris" - Affiché uniquement pour les utilisateurs connectés #}
                 {% if app.user %}
                     <div class="favorite-actions mb-3">
+                        {# Vérifier si l'article est déjà dans les favoris de l'utilisateur #}
                         {% if app.user.isFavorite(article) %}
                             <a href="{{ path('app_favorite_remove', {'id': article.id}) }}" class="btn btn-sm btn-danger favorite-btn">
                                 <i class="fas fa-heart-broken me-1"></i> Retirer des favoris
@@ -34,17 +49,22 @@
                 {% endif %}
             </header>
 
+            {# Corps de l'article - Contenu principal #}
             <div class="article-body mb-4">
+                {# nl2br convertit les retours à la ligne en balises <br> HTML #}
                 {{ article.content|nl2br }}
             </div>
 
+            {# Section médias - Affichée uniquement si l'article contient des médias #}
             {% if article.medias|length > 0 %}
                 <div class="article-media mb-4">
                     <h4>Médias</h4>
                     <div class="row g-3">
+                        {# Boucle sur chaque média associé à l'article #}
                         {% for media in article.medias %}
                             <div class="col-md-4">
                                 <div class="card h-100">
+                                    {# Affichage conditionnel selon le type de média (image ou vidéo) #}
                                     {% if media.type == 'image' %}
                                         <img src="{{ media.url }}" class="card-img-top" alt="Media">
                                     {% elseif media.type == 'video' %}
@@ -70,15 +90,19 @@
             {% endif %}
         </article>
 
+        {# Boutons d'administration - Affichés uniquement pour les administrateurs #}
         {% if is_granted('ROLE_ADMIN') %}
             <div class="article-actions mt-4">
+                {# Bouton de modification d'article #}
                 <a href="{{ path('admin_articles_edit', {'id': article.id}) }}" class="btn btn-warning">
                     <i class="fas fa-edit me-1"></i> Modifier
                 </a>
+                {# Formulaire de suppression avec confirmation JavaScript #}
                 <form method="post" 
                       action="{{ path('admin_articles_delete', {'id': article.id}) }}"
                       class="d-inline-block ms-2" 
                       onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');">
+                    {# Token CSRF pour sécuriser la suppression #}
                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ article.id) }}">
                     <button type="submit" class="btn btn-danger">
                         <i class="fas fa-trash me-1"></i> Supprimer
@@ -89,17 +113,21 @@
 
         {# Section des commentaires #}
         <div class="comments-section mt-5">
+            {# Titre avec compteur de commentaires approuvés #}
             <h3 class="mb-4">Commentaires ({{ article.comments|filter(c => c.isApproved)|length }})</h3>
             
-            {# Affichage des commentaires approuvés #}
+            {# Liste des commentaires - Affichée uniquement s'il y a des commentaires approuvés #}
             {% if article.comments|filter(c => c.isApproved)|length > 0 %}
                 <div class="comments-list mb-4">
+                    {# Boucle sur chaque commentaire approuvé #}
                     {% for comment in article.comments|filter(c => c.isApproved) %}
                         <div class="comment card mb-3">
                             <div class="card-body">
+                                {# En-tête du commentaire avec auteur, date et actions #}
                                 <div class="comment-meta d-flex justify-content-between mb-2">
                                     <div>
                                         <strong>
+                                            {# Affiche le nom d'utilisateur ou "Anonyme" si pas d'auteur #}
                                             {% if comment.author %}
                                                 {{ comment.author.username }}
                                             {% else %}
@@ -111,6 +139,7 @@
                                         </small>
                                     </div>
                                     
+                                    {# Boutons d'édition/suppression pour admin ou auteur du commentaire #}
                                     {% if is_granted('ROLE_ADMIN') or (app.user and app.user == comment.author) %}
                                         <div class="comment-actions">
                                             <a href="{{ path('app_comment_edit', {'id': comment.id}) }}" class="btn btn-sm btn-outline-secondary">
@@ -125,6 +154,7 @@
                                         </div>
                                     {% endif %}
                                 </div>
+                                {# Contenu du commentaire #}
                                 <div class="comment-content">
                                     {{ comment.content|nl2br }}
                                 </div>
@@ -133,6 +163,7 @@
                     {% endfor %}
                 </div>
             {% else %}
+                {# Message affiché s'il n'y a pas de commentaires #}
                 <div class="alert alert-light mb-4">
                     Aucun commentaire pour le moment. Soyez le premier à commenter !
                 </div>
@@ -142,16 +173,20 @@
             <div class="comment-form-container">
                 <h4 class="mb-3">Ajouter un commentaire</h4>
                 
+                {# Affichage des messages flash de succès #}
                 {% for message in app.flashes('success') %}
                     <div class="alert alert-success">
                         {{ message }}
                     </div>
                 {% endfor %}
                 
+                {# Formulaire disponible uniquement pour les utilisateurs connectés #}
                 {% if app.user %}
                     {{ form_start(comment_form, {'attr': {'class': 'needs-validation'}}) }}
                         <div class="mb-3">
+                            {# Champ de contenu du commentaire #}
                             {{ form_widget(comment_form.content) }}
+                            {# Affichage des erreurs de validation #}
                             {% if comment_form.content.vars.errors|length > 0 %}
                                 <div class="invalid-feedback d-block">
                                     {{ comment_form.content.vars.errors[0].message }}
@@ -163,6 +198,7 @@
                         </button>
                     {{ form_end(comment_form) }}
                 {% else %}
+                    {# Message affiché aux utilisateurs non connectés #}
                     <div class="alert alert-info">
                         <i class="fas fa-info-circle me-1"></i> Vous devez être <a href="{{ path('app_login') }}">connecté</a> pour laisser un commentaire.
                     </div>
@@ -170,6 +206,7 @@
             </div>
         </div>
 
+        {# Bouton de retour à l'accueil #}
         <div class="mt-4">
             <a href="{{ path('app_home') }}" class="btn btn-secondary">
                 <i class="fas fa-arrow-left me-1"></i> Retour à l'accueil

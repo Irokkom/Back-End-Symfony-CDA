@@ -12,66 +12,48 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+// Test d'intégration HomeController + MongoDB
 class HomeControllerMongoDBIntegrationTest extends TestCase
 {
     private $homeController;
-    private $articleRepository;
-    private $categoryRepository;
     private $mongoDBService;
 
     protected function setUp(): void
     {
-        // Création des mocks pour les dépendances
-        $this->articleRepository = $this->createMock(ArticleRepository::class);
-        $this->categoryRepository = $this->createMock(CategoryRepository::class);
+        // Mocks des dépendances
+        $articleRepo = $this->createMock(ArticleRepository::class);
+        $categoryRepo = $this->createMock(CategoryRepository::class);
         $this->mongoDBService = $this->createMock(MongoDBService::class);
         
-        // Configuration du mock pour MongoDBService
+        // Config MongoDB pour vérifier l'interaction
         $this->mongoDBService->expects($this->once())
             ->method('insertVisit')
             ->with('home_page');
         
-        // Création du HomeController avec les mocks de base
+        // Mock du contrôleur
         $this->homeController = $this->getMockBuilder(HomeController::class)
-            ->setConstructorArgs([
-                $this->articleRepository,
-                $this->categoryRepository,
-                $this->mongoDBService
-            ])
-            ->onlyMethods(['render', 'redirectToRoute', 'createForm', 'generateUrl'])
+            ->setConstructorArgs([$articleRepo, $categoryRepo, $this->mongoDBService])
+            ->onlyMethods(['render', 'createForm', 'generateUrl'])
             ->getMock();
         
-        // Configuration des mocks pour les méthodes du controller
-        $formView = $this->createMock(FormView::class);
+        // Config minimale des retours du contrôleur
         $form = $this->createMock(FormInterface::class);
-        $form->expects($this->any())
-            ->method('createView')
-            ->willReturn($formView);
+        $form->method('createView')->willReturn($this->createMock(FormView::class));
         
-        $this->homeController->expects($this->any())
-            ->method('createForm')
-            ->willReturn($form);
-            
-        $this->homeController->expects($this->any())
-            ->method('render')
-            ->willReturn(new Response());
-            
-        $this->homeController->expects($this->any())
-            ->method('generateUrl')
-            ->willReturn('/search');
+        $this->homeController->method('createForm')->willReturn($form);
+        $this->homeController->method('render')->willReturn(new Response());
+        $this->homeController->method('generateUrl')->willReturn('/search');
     }
     
     public function testHomeControllerUsesMongoDBService(): void
     {
-        // Création d'une requête sans paramètre de recherche
+        // Test
         $request = Request::create('/');
-        
-        // Invoque la méthode index via reflection
         $method = new \ReflectionMethod(HomeController::class, 'index');
         $method->setAccessible(true);
         $response = $method->invoke($this->homeController, $request);
         
-        // Vérifier que la réponse est bien une instance de Response
         $this->assertInstanceOf(Response::class, $response);
+        // Le vrai test est dans le setUp (expects)
     }
 }
