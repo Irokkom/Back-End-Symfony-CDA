@@ -49,8 +49,8 @@ security:
 
     access_control:
         # API
-        - { path: ^/api_login_check, roles: PUBLIC_ACCESS }
-        - { path: ^/api, roles: PUBLIC_ACCESS }
+        - { path: ^/api_login_check, roles: ROLE_ADMIN }
+        - { path: ^/api, roles: ROLE_ADMIN }
         # Pages publiques
         - { path: ^/$, roles: PUBLIC_ACCESS }  # Page d'accueil
         - { path: ^/article, roles: PUBLIC_ACCESS }  # Liste des articles et détails

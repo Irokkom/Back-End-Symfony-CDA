@@ -1,0 +1,4 @@
+services:
+    # Mock du service UserProvider pour les tests
+    App\Security\UserProvider:
+        class: 'stdClass'
